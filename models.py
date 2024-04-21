@@ -2,7 +2,7 @@
 # para poder criar o banco de dados precisamos da instancia desse banco de dados que esta no main.py
 
 from main import database
-from datetime import datetime
+from datetime import datetime, timezone
 
 class Usuario(database.Model):
     id = database.Column(database.Integer, primary_key=True)
