@@ -5,6 +5,8 @@ app = Flask(__name__)
 
 lista_usuarios = ['Alai', 'Samir', 'Onur', 'Jan']
 
+app.config['SECRET_KEY'] = '0842ad099743ac670a2b8a9ff48f7c31'
+
 # pagina principal
 @app.route("/")
 def home():
