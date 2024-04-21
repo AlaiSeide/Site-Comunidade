@@ -11,6 +11,9 @@
             <div class="col">
                 <!--Todo formulario precisa ter um metodo post e uma acao vazia-->
                 <form method="POST" action="" class="border p-4 mt-2">
+
+                    <!--Token que devemos sempre cololar embaixo da tag form para deixar o formulario mais seguro-->
+                    {{ form_login.cstf_token }}
                     <legend>Login</legend>
 
                     <fieldset>
@@ -41,6 +44,9 @@
             <div class="col">
                 <!--Todo formulario precisa ter um metodo post e uma acao vazia-->
                 <form method="POST" action="" class="border p-4 mt-2">
+
+                    <!--Token que devemos sempre cololar embaixo da tag form para deixar o formulario mais seguro-->
+                    {{ form_criarconta.cstf_token }}
                     <legend>Criar Conta</legend>
 
                     <fieldset>
