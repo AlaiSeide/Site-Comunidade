@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 
 
 app = Flask(__name__)
@@ -18,10 +18,14 @@ def contato():
 # pagina de usuarios
 @app.route("/usuarios")
 def usuarios():
+    # meus_usuarios=lista_usuarios está dentro da minha funcao render_template() para poder ser mostrado dentro da minha pagina html
     return render_template('usuarios.html', meus_usuarios=lista_usuarios)
 
 
-
+# pagina de login e criar_conta
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
