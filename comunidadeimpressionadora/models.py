@@ -1,7 +1,7 @@
 # Arquivo de banco de dados
 # para poder criar o banco de dados precisamos da instancia desse banco de dados que esta no main.py
 
-from main import database
+from comunidadeimpressionadora import database
 from datetime import datetime, timezone
 
 class Usuario(database.Model):
