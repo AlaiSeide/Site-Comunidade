@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
 
+<div class="container">
+    <h1>Usuarios</h1>
+</div>
+<hr>
 
 {% block body %}
-    <h1>Usuarios</h1>
     {% for usuario in meus_usuarios %}
-        <div class="container">
-            <p>{{ usuario }}</p>
-            <hr>
-        </div>
+            <div class="container">
+                <p>{{ usuario }}</p>
+                <hr>
+            </div>
     {% endfor %}
-
-
 {% endblock %}
