@@ -10,6 +10,7 @@ class Usuario(database.Model):
     email = database.Column(database.String, nullable=False, unique=True)
     senha = database.Column(database.String, nullable=False)
     foto_perfil = database.Column(database.String, nullable=False, default='default.jpg')
+    # esse backref='autor' é para depois na tabela Post eu poder descobrir o autor do post
     posts = database.relationship('Post', backref='autor', lazy=True)
     cursos = database.Column(database.String, nullable=False, default='Nao Informado')
 
@@ -20,4 +21,5 @@ class Post(database.Model):
     corpo = database.Column(database.Text, nullable=False)
     # Use datetime.now(timezone.utc) para criar um datetime consciente do fuso horário UTC
     data_criacao = database.Column(database.DateTime, nullable=False, default=datetime.now(timezone.utc))
+    # 'usuario.id' é a minha tabela de usuario pegando o id
     id_usuario = database.Column(database.Integer,  database.ForeignKey('usuario.id'), nullable=False)

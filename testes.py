@@ -32,7 +32,50 @@ from models import Usuario, Post
 #     segundo_usuario = meus_usuarios[1]
 #     print(segundo_usuario.email)
 
+# with app.app_context():
+#     usuario_teste = Usuario.query.filter_by(id=2).first()
+#     print(usuario_teste)
+#     print(usuario_teste.username)
+
+
+# # Criar um usuario
+# usuario3 = Usuario(username='Adul', email='baldeadul70@outlook.com', senha= '12345')
+# # adicionar o usuario no meu banco de dados
+# with app.app_context():
+#     database.session.add(usuario3)
+#     database.session.commit()
+
+# fazer busca no meu banco de dados
+# with app.app_context():
+      # pegar o primeiro usuario
+#     primeiro_usuario = Usuario.query.first()
+#     print(primeiro_usuario.email)
+
+    # pegar todos os usuarios
+    # meus_usuarios = Usuario.query.all()
+    # print(meus_usuarios[2].senha)
+
+
+# fazendo busca no meu banco de dados e filtrando baseado numa condicao
+# with app.app_context():
+#     usuario_teste = Usuario.query.filter_by(id=2).first()
+#     print(usuario_teste.email)
+
+# Criando um posto
+
+# with app.app_context():
+#     meu_post = Post(titulo='primeiro poste de alai', id_usuario=1, corpo='Eu voando')
+#     database.session.add(meu_post)
+#     database.session.commit()
+
+
+# fazendo busca no meu banco de dados
+# with app.app_context():
+#     meus_postes = Post.query.all()
+#     print(meus_postes[0].autor.email)
+
+
+# deletar tudo e criar o banco de dados de novo
 with app.app_context():
-    usuario_teste = Usuario.query.filter_by(id=2).first()
-    print(usuario_teste)
-    print(usuario_teste.username)
+    database.drop_all()
+    database.create_all()
