@@ -15,5 +15,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comunidade.db'
 # Associar o objeto SQLAlchemy à instância do Flask permite usar recursos do SQLAlchemy na aplicação Flask
 database = SQLAlchemy(app)
 
+
 # preciso executar o arquivo routes por isso importei ele aqui
 from comunidadeimpressionadora import routes

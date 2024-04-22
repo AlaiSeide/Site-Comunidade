@@ -1,4 +1,4 @@
-from main import app, database
+from comunidadeimpressionadora import app, database
 from comunidadeimpressionadora.models import Usuario, Post
 
 
@@ -76,6 +76,10 @@ from comunidadeimpressionadora.models import Usuario, Post
 
 
 # deletar tudo e criar o banco de dados de novo
+# with app.app_context():
+#     database.drop_all()
+#     database.create_all()
+
 with app.app_context():
-    database.drop_all()
-    database.create_all()
+    meus_usuarios = Usuario.query.all()
+    print(meus_usuarios[0].email)
