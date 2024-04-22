@@ -1,5 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 
 
 app = Flask(__name__)
@@ -14,7 +16,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comunidade.db'
 # SQLAlchemy é uma biblioteca para trabalhar com bancos de dados relacionais de forma orientada a objetos
 # Associar o objeto SQLAlchemy à instância do Flask permite usar recursos do SQLAlchemy na aplicação Flask
 database = SQLAlchemy(app)
-
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
 
 # preciso executar o arquivo routes por isso importei ele aqui
 from comunidadeimpressionadora import routes

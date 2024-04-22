@@ -80,6 +80,10 @@ from comunidadeimpressionadora.models import Usuario, Post
 #     database.drop_all()
 #     database.create_all()
 
-with app.app_context():
-    meus_usuarios = Usuario.query.all()
-    print(meus_usuarios[0].email)
+# with app.app_context():
+#     meus_usuarios = Usuario.query.all()
+#     print(meus_usuarios[2].senha)
+
+# with app.app_context():
+#     usuario2 = Usuario.query.filter_by(username='Maicon').first()
+#     print(usuario2.senha)
