@@ -36,7 +36,7 @@ def login():
 
     # Verifica se o usuario fez login com sucesso
     if form_login.validate_on_submit() and 'botao_submit_login' in request.form:
-        # criar usuario
+        # Então, resumindo, essa linha de código está procurando no banco de dados pelo usuário que possui o email fornecido no formulário de login e armazenando esse usuário na variável usuario.
         usuario = Usuario.query.filter_by(email=form_login.email.data).first()
         # se o usuario existe e se a senha que ele preencheu é a mesma que ta no banco de dados
         if usuario and bcrypt.check_password_hash(usuario.senha, form_login.senha.data):
