@@ -1,8 +1,9 @@
 from flask import render_template, redirect, url_for, flash, request
 from comunidadeimpressionadora import app, database, bcrypt
-from comunidadeimpressionadora.forms import FormCriarConta, FormLogin
+from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil
 from comunidadeimpressionadora.models import Usuario
 from flask_login import login_user, logout_user, current_user, login_required
+
 
 lista_usuarios = ['Alai', 'Samir', 'Onur', 'Jan']
 
@@ -104,3 +105,29 @@ def perfil():
 @login_required
 def criar_post():
     return render_template('criarpost.html')
+
+
+@app.route('/perfil/editar', methods=['GET', 'POST'])
+@login_required
+def editar_perfil():
+    # uma instancia da minha classe FormEdiarPerfil
+    formeditarperfil = FormEdiarPerfil()
+
+    # validar o meu formulario
+    if formeditarperfil.validate_on_submit():
+        current_user.email = formeditarperfil.email.data
+        current_user.username = formeditarperfil.username.data
+        database.session.commit()
+        flash(f'Perfil Atualizado com Sucesso', 'alert-success')
+        return redirect(url_for('perfil'))
+    # preencher o formulario automaticamente
+    # Verifica se a requisição HTTP é do tipo GET, ou seja, se é a primeira vez que a página está sendo carregada.
+    elif request.method == 'GET':
+        # Se a requisição for do tipo GET, preenche os campos do formulário de edição de perfil com os dados atuais do usuário.
+        # Preenche o campo de e-mail com o e-mail atual do usuário logado.
+        formeditarperfil.email.data = current_user.email
+        # Preenche o campo de nome de usuário com o nome de usuário atual do usuário logado.
+        formeditarperfil.username.data = current_user.username
+        
+    foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
+    return render_template('editarperfil.html', foto_perfil=foto_perfil, formeditarperfil=formeditarperfil)

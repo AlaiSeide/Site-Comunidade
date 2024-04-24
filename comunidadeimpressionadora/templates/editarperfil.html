@@ -1,0 +1,66 @@
+{% extends 'perfil.html' %}
+
+{% block form_editar_perfil %}
+
+<div class="container">
+    <hr>
+    <div class="row d-flex justify-content-center">
+        <!--Formulario de Editar Perfil-->
+        <div class="col col-6">
+            <!--Todo formulario precisa ter um metodo post e uma acao vazia-->
+            <form method="POST" action="" class="border p-4 mt-2">
+
+                <!--Token que devemos sempre cololar embaixo da tag form para deixar o formulario mais seguro-->
+                {{ formeditarperfil.csrf_token }}
+                <legend class="text-center">Editar Perfil</legend>
+
+                <fieldset>
+                    <!--Campo de usernmae-->
+                    <div class="form-group">
+                        <!--Essas classes é do Bootstrap (class="form-control-label") -->
+                        {{ formeditarperfil.username.label(class="form-control-label") }}
+
+                        <!--Fazendo aparecer os erros caso tenha um erro no username digitado-->
+                        {% if formeditarperfil.username.errors %}
+                            {{ formeditarperfil.username(class="form-control is-invalid") }}
+                            <!--O erro-->
+                            <div class="invalid-feedback">
+                                {% for erro in formeditarperfil.username.errors %}
+                                    {{ erro }}
+                                {% endfor %}
+                            </div>
+                        <!--Caso nao tenha nenhum erro-->    
+                        {% else %}
+                            {{ formeditarperfil.username(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <!--Campo de email-->
+                    <div class="form-group">
+                        <!--Essas classes é do Bootstrap (class="form-control-label") -->
+                        {{ formeditarperfil.email.label(class="form-control-label") }}
+
+                        <!--Fazendo aparecer os erros caso tenha um erro no username digitado-->
+                        {% if formeditarperfil.email.errors %}
+                            {{ formeditarperfil.email(class="form-control is-invalid") }}
+                            <!--O erro-->
+                            <div class="invalid-feedback">
+                                {% for erro in formeditarperfil.email.errors %}
+                                    {{ erro }}
+                                {% endfor %}
+                            </div>
+                        <!--Caso nao tenha nenhum erro-->    
+                        {% else %}
+                            {{ formeditarperfil.email(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </fieldset>
+
+                <!--Botao de Corfirmacao-->
+                {{ formeditarperfil.botao_submit_editarperfil(class="btn btn-outline-warning mt-2") }}
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
