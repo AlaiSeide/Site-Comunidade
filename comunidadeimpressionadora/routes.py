@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request
 from comunidadeimpressionadora import app, database, bcrypt
 from comunidadeimpressionadora.forms import FormCriarConta, FormLogin
 from comunidadeimpressionadora.models import Usuario
-from flask_login import login_user
+from flask_login import login_user, logout_user, current_user, login_required
 
 lista_usuarios = ['Alai', 'Samir', 'Onur', 'Jan']
 
@@ -18,6 +18,7 @@ def contato():
 
 # pagina de usuarios
 @app.route("/usuarios")
+@login_required
 def usuarios():
     # meus_usuarios=lista_usuarios está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
     return render_template('usuarios.html', meus_usuarios=lista_usuarios)
@@ -40,13 +41,22 @@ def login():
         usuario = Usuario.query.filter_by(email=form_login.email.data).first()
         # se o usuario existe e se a senha que ele preencheu é a mesma que ta no banco de dados
         if usuario and bcrypt.check_password_hash(usuario.senha, form_login.senha.data):
-            # fazendo login
+            # fazendo login do usuario
             login_user(usuario, remember=form_login.lembrar_dados.data)
             # exibir msg de login feito com sucesso aseguido do e-amil dessa pessoal
             flash(f'Login feito com sucesso no e-mail: {form_login.email.data}', 'alert-success')
             # redirecionar para outra pagina
             # o return deve estar sempre atras do redirect(url_for('home'))
-            return redirect(url_for("home"))
+
+            # Obtém o parâmetro 'next' da query string da URL, que é geralmente usado para redirecionar o usuário após o login.
+            parametro_next = request.args.get('next')
+            # Verifica se o parâmetro 'next' foi fornecido na query string.
+            if parametro_next:
+                # Se o parâmetro 'next' estiver presente, redireciona o usuário para o URL fornecido pelo parâmetro 'next'.
+                return redirect(parametro_next)
+            else:
+                # Se o parâmetro 'next' não estiver presente, redireciona o usuário para a página inicial ('home') da aplicação.
+                return redirect(url_for("home"))
         else:
             flash(f'Falha no Login. E-mail ou Senha Incorretos.','alert-danger')
 
@@ -71,3 +81,25 @@ def login():
 
     # form_login=form_login, form_criarconta=form_criarconta está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
     return render_template('login.html', form_login=form_login, form_criarconta=form_criarconta)
+
+
+# pagina de sair
+@app.route('/sair')
+@login_required
+def sair():
+    # sair e redirecionar para a pagina home
+    logout_user()
+    flash('Logout feito com Sucesso', 'alert-success')
+    return redirect(url_for('home'))
+
+# pagina de ver o perfil
+@app.route('/perfil')
+@login_required
+def perfil():
+    return render_template('perfil.html')
+
+# pagina de criar post
+@app.route('/post/criar')
+@login_required
+def criar_post():
+    return render_template('criarpost.html')

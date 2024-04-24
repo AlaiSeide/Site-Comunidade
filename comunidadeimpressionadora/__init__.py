@@ -19,5 +19,11 @@ database = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
+# a pagina onde o usuario sera redirecionado caso tente acessar uma pagina sem fazer login
+# passei login que é a minha pagina de cadastro
+login_manager.login_view = 'login'
+login_manager.login_message = 'Faça login para acessar esta página, por favor.'
+login_manager.login_message_category = 'alert-info'
+
 # preciso executar o arquivo routes por isso importei ele aqui
 from comunidadeimpressionadora import routes
