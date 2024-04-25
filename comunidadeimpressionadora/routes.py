@@ -28,7 +28,7 @@ def usuarios():
 # pagina de login e criar_conta
 # A funcao e uma pagina de formulario tem que ter o metodo POST/GET
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login(): 
 
     # instanciando o meu formulario de login a minha classe FormLogin()
     form_login = FormLogin()
@@ -40,6 +40,7 @@ def login():
     if form_login.validate_on_submit() and 'botao_submit_login' in request.form:
         # Então, resumindo, essa linha de código está procurando no banco de dados pelo usuário que possui o email fornecido no formulário de login e armazenando esse usuário na variável usuario.
         usuario = Usuario.query.filter_by(email=form_login.email.data).first()
+        print(usuario.senha)
         # se o usuario existe e se a senha que ele preencheu é a mesma que ta no banco de dados
         if usuario and bcrypt.check_password_hash(usuario.senha, form_login.senha.data):
             # fazendo login do usuario
@@ -66,7 +67,7 @@ def login():
     if form_criarconta.validate_on_submit() and 'botao_submit_criarconta' in request.form:
         # criptografar a senha
         senha_cript = bcrypt.generate_password_hash(form_criarconta.senha.data)
-
+        print(senha_cript)
         # Criar o usuario
         # adicionar na sessao
         # dar commit da sessao

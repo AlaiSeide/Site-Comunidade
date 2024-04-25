@@ -10,7 +10,12 @@ app.config['SECRET_KEY'] = '0842ad099743ac670a2b8a9ff48f7c31'
 # Configuração da URI do banco de dados SQLite
 # Indica ao SQLAlchemy onde encontrar o banco de dados
 # 'sqlite:///comunidade.db' significa que o banco de dados SQLite está localizado no arquivo 'comunidade.db' no diretório atual
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comunidade.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comunidade.db'
+
+# pip install mysqlclient
+localhost =  '192.168.220.130'
+# Configuração da conexão com o banco de dados MySQL no XAMPP
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://root:flashreverso20@{localhost}/comunidade'
 
 # Criação de um objeto SQLAlchemy e associação à instância do Flask (app)
 # SQLAlchemy é uma biblioteca para trabalhar com bancos de dados relacionais de forma orientada a objetos

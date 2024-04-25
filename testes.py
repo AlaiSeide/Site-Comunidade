@@ -3,6 +3,7 @@ from comunidadeimpressionadora.models import Usuario, Post
 
 
 # with app.app_context():
+#     database.drop_all()
 #     database.create_all()
 
 ################################
@@ -87,3 +88,14 @@ from comunidadeimpressionadora.models import Usuario, Post
 # with app.app_context():
 #     usuario2 = Usuario.query.filter_by(username='Maicon').first()
 #     print(usuario2.senha)
+
+
+from flask_bcrypt import generate_password_hash, check_password_hash
+
+password = "meinPasswort123"
+hashed_password = generate_password_hash(password)
+
+print(hashed_password)
+# verificar se a senha é igual a hash
+print(check_password_hash(hashed_password ,password))
+print(len(hashed_password))  # Ausgabe: 60
