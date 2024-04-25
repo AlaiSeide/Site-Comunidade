@@ -40,7 +40,7 @@ def login():
     if form_login.validate_on_submit() and 'botao_submit_login' in request.form:
         # Então, resumindo, essa linha de código está procurando no banco de dados pelo usuário que possui o email fornecido no formulário de login e armazenando esse usuário na variável usuario.
         usuario = Usuario.query.filter_by(email=form_login.email.data).first()
-        print(usuario.senha)
+        #print(usuario.senha)
         # se o usuario existe e se a senha que ele preencheu é a mesma que ta no banco de dados
         if usuario and bcrypt.check_password_hash(usuario.senha, form_login.senha.data):
             # fazendo login do usuario
@@ -67,7 +67,7 @@ def login():
     if form_criarconta.validate_on_submit() and 'botao_submit_criarconta' in request.form:
         # criptografar a senha
         senha_cript = bcrypt.generate_password_hash(form_criarconta.senha.data)
-        print(senha_cript)
+        #print(senha_cript)
         # Criar o usuario
         # adicionar na sessao
         # dar commit da sessao
@@ -98,7 +98,8 @@ def sair():
 @app.route('/perfil')
 @login_required
 def perfil():
-    foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
+    foto_perfil = f'/static/fotos_perfil/{current_user.foto_perfil}'
+    # foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
     return render_template('perfil.html', foto_perfil=foto_perfil)
 
 # pagina de criar post
@@ -129,6 +130,7 @@ def editar_perfil():
         formeditarperfil.email.data = current_user.email
         # Preenche o campo de nome de usuário com o nome de usuário atual do usuário logado.
         formeditarperfil.username.data = current_user.username
-        
-    foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
+    
+    foto_perfil = f'/static/fotos_perfil/{current_user.foto_perfil}'
+    # foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
     return render_template('editarperfil.html', foto_perfil=foto_perfil, formeditarperfil=formeditarperfil)
