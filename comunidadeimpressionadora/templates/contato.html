@@ -3,7 +3,66 @@
 
 
 {% block body %}
-    <div class="container">
-        <h1>Pagina de Contato</h1>
-    </div>
+
+  <div class="container">
+    <h1 class="mt-5 mb-3">Contate-nos</h1>
+    <form method="POST">
+        {{ contatoform.csrf_token }}
+
+        <!--Campo de Nome-->
+        <div class="mb-3">
+            {{ contatoform.nome.label(class="form-label") }}
+            <!--Fazendo aparecer os erros caso tenha um erro no nome digitado-->
+            {% if contatoform.nome.errors %}
+                {{ contatoform.nome(class="form-control is-invalid") }}
+                <!--O erro-->
+                <div class="invalid-feedback">
+                    {% for erro in contatoform.nome.errors %}
+                        {{ erro }}
+                    {% endfor %}
+                </div>
+                <!--Caso nao tenha nenhum erro-->  
+            {% else %}
+                {{ contatoform.nome(class="form-control") }}
+            {% endif %}
+          </div>
+
+          <!--Campo de E-mail-->
+          <div class="mb-3">
+            {{ contatoform.email.label(class="form-label") }}
+            <!--Fazendo aparecer os erros caso tenha um erro no email digitado-->
+            {% if contatoform.email.errors %}
+                {{ contatoform.email(class="form-control is-invalid") }}
+                <!--O erro-->
+                <div class="invalid-feedback">
+                    {% for erro in contatoform.email.errors %}
+                        {{ erro }}
+                    {% endfor %}
+                </div>
+            <!--Caso nao tenha nenhum erro-->  
+            {% else %}
+                {{ contatoform.email(class="form-control") }}
+            {% endif %}
+          </div>
+          
+          <!--Campo da mensagem-->
+          <div class="mb-3">
+            {{ contatoform.mensagem.label(class="form-label") }}
+            <!--Fazendo aparecer os erros caso tenha um erro na mensagem digitado-->
+            {% if contatoform.mensagem.errors %}
+                {{ contatoform.mensagem(class="form-control is-invalid") }}
+                <!--O erro-->
+                <div class="invalid-feedback">
+                    {% for erro in contatoform.mensagem.errors %}
+                        {{ erro }}
+                    {% endfor %}
+                </div>
+            <!--Caso nao tenha nenhum erro-->    
+            {% else %}
+                {{ contatoform.mensagem(class="form-control") }}
+            {% endif %}
+          </div>
+          {{ contatoform.submit(class="btn btn-warning mt-2") }}
+  </div>
+
 {% endblock %}

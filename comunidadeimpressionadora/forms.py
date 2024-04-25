@@ -1,6 +1,6 @@
 # Arquivo de formularios
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
 from comunidadeimpressionadora.models import Usuario
 from flask_login import current_user
@@ -47,3 +47,11 @@ class FormEdiarPerfil(FlaskForm):
             # Se um usuário com o mesmo e-mail é encontrado, lança uma exceção de validação com uma mensagem de erro.
             if usuario:
                 raise ValidationError('Já existe um usuário com esse E-mail. Por favor, cadastre outro E-mail.')
+            
+
+
+class ContatoForm(FlaskForm):
+    nome = StringField('Nome', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    mensagem = TextAreaField('Mensagem', validators=[DataRequired()])
+    submit = SubmitField('Enviar')

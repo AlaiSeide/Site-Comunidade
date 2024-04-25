@@ -1,8 +1,12 @@
 from flask import render_template, redirect, url_for, flash, request
 from comunidadeimpressionadora import app, database, bcrypt
-from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil
-from comunidadeimpressionadora.models import Usuario
+from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm
+from comunidadeimpressionadora.models import Usuario, Contato
 from flask_login import login_user, logout_user, current_user, login_required
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 lista_usuarios = ['Alai', 'Samir', 'Onur', 'Jan']
@@ -13,9 +17,42 @@ def home():
     return render_template('home.html')
 
 # pagina de contato
-@app.route("/contato")
+@app.route("/contato", methods=['GET', 'POST'])
 def contato():
-    return render_template('contato.html')
+        contatoform = ContatoForm()
+        if contatoform.validate_on_submit():
+            contato = Contato(nome=contatoform.nome.data, email=contatoform.email.data, mensagem=contatoform.mensagem.data)
+            database.session.add(contato)
+            database.session.commit()
+            print(request.form)
+            flash('Sua mensagem foi enviada com sucesso!', 'alert-success')
+        elif request.method == 'GET' and current_user.is_authenticated:
+           contatoform.nome.data = current_user.username
+           contatoform.email.data = current_user.email
+
+        # Configuração do email
+        # meu_email = "alaiseide2006@gmail.com"  # Substitua pelo seu email
+        # minha_senha = "Flashrevers20102010.."  # Substitua pela sua senha
+
+        # # Criar a mensagem
+        # msg = MIMEMultipart()
+        # msg['From'] = meu_email
+        # msg['To'] = meu_email  # Você pode substituir por qualquer outro email
+        # msg['Subject'] = "Nova mensagem de contato"
+        # corpo_email = f"Nome: {contatoform.nome.data}\nEmail: {contatoform.email.data}\nMensagem:\n{contatoform.mensagem.data}"
+        # msg.attach(MIMEText(corpo_email, 'plain'))
+
+        # # Enviar o email
+        # server = smtplib.SMTP('smtp.gmail.com', 587)  # Use o servidor SMTP do seu provedor de email
+        # server.starttls()
+        # server.login(meu_email, minha_senha)
+        # text = msg.as_string()
+        # server.sendmail(meu_email, meu_email, text)
+        # server.quit()
+        # Aqui você pode adicionar o código para lidar com os dados do formulário de contato
+        # Por exemplo, você pode enviar um e-mail com a mensagem ou armazená-la em um banco de dados
+
+        return render_template('contato.html', contatoform=contatoform)
 
 # pagina de usuarios
 @app.route("/usuarios")
@@ -63,8 +100,11 @@ def login():
             flash(f'Falha no Login. E-mail ou Senha Incorretos.','alert-danger')
 
             
+        """
+        request.form é um dicionário que contém todos os campos do formulário. A chave é o nome do campo e o valor é o valor do campo. Então, 'botao_submit_criarconta' in request.form verifica se a chave 'botao_submit_criarconta' está presente no dicionário request.form, o que significaria que o botão de submit do formulário de criação de conta foi pressionado."""
     # Verifica se o usuario criou conta com sucesso
     if form_criarconta.validate_on_submit() and 'botao_submit_criarconta' in request.form:
+        # print(request.form)
         # criptografar a senha
         senha_cript = bcrypt.generate_password_hash(form_criarconta.senha.data)
         #print(senha_cript)
@@ -75,6 +115,8 @@ def login():
         database.session.add(usuario)
         database.session.commit()
 
+        # fazendo login do usuario
+        login_user(usuario)
         # exibir msg de conta criada com sucesso
         flash(f'Conta Criada para o e-mail: {form_criarconta.email.data}', 'alert-success')
         # redirecionar para outra pagina

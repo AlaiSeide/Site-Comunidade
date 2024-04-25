@@ -30,3 +30,11 @@ class Post(database.Model):
     data_criacao = database.Column(database.DateTime, nullable=False, default=datetime.now(timezone.utc))
     # 'usuario.id' é a minha tabela de usuario pegando o id
     id_usuario = database.Column(database.Integer,  database.ForeignKey('usuario.id'), nullable=False)
+
+
+
+class Contato(database.Model):
+    id = database.Column(database.Integer, primary_key=True)
+    nome = database.Column(database.String(100), nullable=False)
+    email = database.Column(database.String(100), nullable=False)
+    mensagem = database.Column(database.Text, nullable=False)
