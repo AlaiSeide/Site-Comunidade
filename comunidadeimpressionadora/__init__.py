@@ -13,7 +13,12 @@ app.config['SECRET_KEY'] = '0842ad099743ac670a2b8a9ff48f7c31'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comunidade.db'
 
 # pip install mysqlclient
-localhost =  '192.168.220.130'
+# local_hoost de integra
+# localhost =  '192.168.220.130'
+
+# localhost de Bötelkamp
+localhost =  '192.168.56.1'
+
 # Configuração da conexão com o banco de dados MySQL no XAMPP
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://root:flashreverso20@{localhost}/comunidade'
 

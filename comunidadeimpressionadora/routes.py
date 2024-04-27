@@ -22,6 +22,7 @@ def contato():
         contatoform = ContatoForm()
         if contatoform.validate_on_submit():
             contato = Contato(nome=contatoform.nome.data, email=contatoform.email.data, mensagem=contatoform.mensagem.data)
+
             database.session.add(contato)
             database.session.commit()
             print(request.form)
@@ -102,6 +103,7 @@ def login():
             
         """
         request.form é um dicionário que contém todos os campos do formulário. A chave é o nome do campo e o valor é o valor do campo. Então, 'botao_submit_criarconta' in request.form verifica se a chave 'botao_submit_criarconta' está presente no dicionário request.form, o que significaria que o botão de submit do formulário de criação de conta foi pressionado."""
+   
     # Verifica se o usuario criou conta com sucesso
     if form_criarconta.validate_on_submit() and 'botao_submit_criarconta' in request.form:
         # print(request.form)
