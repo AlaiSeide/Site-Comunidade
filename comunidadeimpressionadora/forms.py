@@ -1,8 +1,9 @@
 # Arquivo de formularios
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
-from comunidadeimpressionadora.models import Usuario
+from comunidadeimpressionadora.models import Usuario, Contato
 from flask_login import current_user
 
 # Formularios de criar conta
@@ -32,6 +33,7 @@ class FormLogin(FlaskForm):
 class FormEdiarPerfil(FlaskForm):
     username = StringField('Nome de Usuário', validators=[DataRequired()])
     email = StringField('E-mail', validators=[DataRequired(), Email()])
+    foto_perfil = FileField('Atualizar Foto de Perfil', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Apenas arquivos .jpg e .png são permitidos.')])
     botao_submit_editarperfil = SubmitField('Corfirmar Edicao')
 
     # funcao de validacao antes de mudar o email do usuario
@@ -53,5 +55,23 @@ class FormEdiarPerfil(FlaskForm):
 class ContatoForm(FlaskForm):
     nome = StringField('Nome', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
+
+            
     mensagem = TextAreaField('Mensagem', validators=[DataRequired()])
     submit = SubmitField('Enviar')
+
+    def validate_email(self, email):
+        usuario = Contato.query.filter_by(email=email.data).first()
+        if usuario:
+            raise ValidationError('Voce ja tinha enviado uma Mensagem espera até ser respondida...')
+
+    # def validate_email(self, email):
+    #     if current_user.is_authenticated:
+    #         usuario = Contato.query.filter_by(email=email.data).first()
+            
+    #         if usuario:
+    #             raise ValidationError('Voce ja tinha enviado uma Mensagem espera até ser respondida...')
+    #     else:
+    #         usuario = Contato.query.filter_by(email=email.data).first()
+    #         if usuario:
+    #             raise ValidationError('Voce ja tinha enviado uma Mensagem espera até ser respondida...')

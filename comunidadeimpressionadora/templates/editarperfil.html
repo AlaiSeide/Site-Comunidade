@@ -8,13 +8,14 @@
         <!--Formulario de Editar Perfil-->
         <div class="col col-6">
             <!--Todo formulario precisa ter um metodo post e uma acao vazia-->
-            <form method="POST" action="" class="border p-4 mt-2">
-
+            <!--Sempre que eu tiver um formulario que permita subir um arquivo, dentro do form html tenho que passar um paramentro enctype="multipart/form-data" -->
+            <form method="POST" action="" class="border p-4 mt-2" enctype="multipart/form-data">
                 <!--Token que devemos sempre cololar embaixo da tag form para deixar o formulario mais seguro-->
                 {{ formeditarperfil.csrf_token }}
                 <legend class="text-center">Editar Perfil</legend>
 
                 <fieldset>
+
                     <!--Campo de usernmae-->
                     <div class="form-group">
                         <!--Essas classes é do Bootstrap (class="form-control-label") -->
@@ -54,6 +55,23 @@
                             {{ formeditarperfil.email(class="form-control") }}
                         {% endif %}
                     </div>
+
+                    <!--Campo de Imagem-->
+                    <div class="form-group">
+                        {{ formeditarperfil.foto_perfil.label }}
+                        <!-- É uma classe do bootstrap (class="form-control-file") -->
+                        {{ formeditarperfil.foto_perfil(class="form-control-file") }}
+
+                        <!--Verificar se existe algum erro-->
+                        {% if formeditarperfil.foto_perfil.errors %}
+                            <!--Percorer todos os erros-->
+                            {% for erro in formeditarperfil.foto_perfil.errors %}
+                                <!--O <br> no final do span é por acaso de aparecer mais do que um erro ele pular a linha-->
+                                <span class="text-danger">{{ erro }}</span><br>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
                 </fieldset>
 
                 <!--Botao de Corfirmacao-->

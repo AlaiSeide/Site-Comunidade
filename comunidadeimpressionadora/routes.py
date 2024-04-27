@@ -3,6 +3,9 @@ from comunidadeimpressionadora import app, database, bcrypt
 from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm
 from comunidadeimpressionadora.models import Usuario, Contato
 from flask_login import login_user, logout_user, current_user, login_required
+import secrets
+import os
+from PIL import Image
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -26,6 +29,9 @@ def contato():
             database.session.add(contato)
             database.session.commit()
             print(request.form)
+            print(request.method)
+            print(request.full_path)
+            print(request.args)
             flash('Sua mensagem foi enviada com sucesso!', 'alert-success')
         elif request.method == 'GET' and current_user.is_authenticated:
            contatoform.nome.data = current_user.username
@@ -153,6 +159,27 @@ def criar_post():
     return render_template('criarpost.html')
 
 
+# uma funcao que vai fazer todas as validacoes da imagem e salvar-la
+def salvar_imagem(imagem):
+    # adicionar um codigo aleatorio no nome da imagem
+    codigo = secrets.token_hex(8)
+    # separar o nome do arquivo com a extensao
+    nome, extensao = os.path.splitext(imagem.filename)
+    # juntar nome, codigo e a extensao
+    nome_arquivo = nome + codigo + extensao
+    # salvar a imagem na pasta fotos_perfil
+    #  o app.root_path seria o caminho do novo app que é comunidadeimpressionadora
+    caminho_completo = os.path.join(app.root_path, 'static/fotos_perfil', nome_arquivo)
+    # reduzir o tamanho da imagem
+    # 200x200 px
+    tamanho = (200, 200)
+    imagem_reduzida = Image.open(imagem)
+    imagem_reduzida.thumbnail(tamanho)
+    # salvar a imagem na pasta fotos_perfil
+    imagem_reduzida.save(caminho_completo)
+    # mudar o campo foto_perfil do usuario para o novo nome
+    return nome_arquivo
+
 @app.route('/perfil/editar', methods=['GET', 'POST'])
 @login_required
 def editar_perfil():
@@ -161,11 +188,25 @@ def editar_perfil():
 
     # validar o meu formulario
     if formeditarperfil.validate_on_submit():
+        # mudar o email e o username do usuario
         current_user.email = formeditarperfil.email.data
         current_user.username = formeditarperfil.username.data
+        # verificar se eu tenho que mudar a foto de perfil
+        if formeditarperfil.foto_perfil.data:
+            # adicionar um codigo aleatorio no nome da imagem
+            # reduzir o tamanho da imagem
+            # salvar a imagem na pasta fotos_perfil
+            # mudar o campo foto_perfil do usuario para o novo nome da imagem
+            nome_imagem = salvar_imagem(formeditarperfil.foto_perfil.data)
+            #print(formeditarperfil.foto_perfil.data)
+            # mudar a foto do perfil
+            current_user.foto_perfil = nome_imagem
+
         database.session.commit()
         flash(f'Perfil Atualizado com Sucesso', 'alert-success')
+        # redirecionar para a pagina do perfil dele
         return redirect(url_for('perfil'))
+    
     # preencher o formulario automaticamente
     # Verifica se a requisição HTTP é do tipo GET, ou seja, se é a primeira vez que a página está sendo carregada.
     elif request.method == 'GET':

@@ -2,9 +2,9 @@ from comunidadeimpressionadora import app, database
 from comunidadeimpressionadora.models import Usuario, Post, Contato
 
 
-with app.app_context():
-    database.drop_all()
-    database.create_all()
+# with app.app_context():
+#     database.drop_all()
+#     database.create_all()
 
 ################################
 # with app.app_context():
@@ -33,10 +33,12 @@ with app.app_context():
 #     segundo_usuario = meus_usuarios[1]
 #     print(segundo_usuario.email)
 
-# with app.app_context():
-#     usuario_teste = Usuario.query.filter_by(id=2).first()
-#     print(usuario_teste)
-#     print(usuario_teste.username)
+with app.app_context():
+    usuario_teste = Usuario.query.filter_by(id=2).first()
+    print(usuario_teste)
+    usuario = Usuario.query.filter_by(email='tenw313@gmail.com').first()
+    print(usuario)
+    print(usuario_teste.username)
 
 
 # # Criar um usuario
