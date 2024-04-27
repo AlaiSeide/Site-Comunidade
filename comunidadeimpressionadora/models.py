@@ -19,7 +19,7 @@ class Usuario(database.Model, UserMixin):
     foto_perfil = database.Column(database.String(50), nullable=False, default='default.jpg')
     # esse backref='autor' é para depois na tabela Post eu poder descobrir o autor do post
     posts = database.relationship('Post', backref='autor', lazy=True)
-    cursos = database.Column(database.String(50), nullable=False, default='Nao Informado')
+    cursos = database.Column(database.String(500), nullable=False, default='Nao Informado')
 
 
 class Post(database.Model):

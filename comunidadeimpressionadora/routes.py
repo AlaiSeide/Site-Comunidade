@@ -79,7 +79,6 @@ def login():
 
     # instanciando o meu formulario de criar_conta a minha classe FormCriarConta()
     form_criarconta = FormCriarConta()
-
     # Verifica se o usuario fez login com sucesso
     if form_login.validate_on_submit() and 'botao_submit_login' in request.form:
         # Então, resumindo, essa linha de código está procurando no banco de dados pelo usuário que possui o email fornecido no formulário de login e armazenando esse usuário na variável usuario.
@@ -180,6 +179,19 @@ def salvar_imagem(imagem):
     # mudar o campo foto_perfil do usuario para o novo nome
     return nome_arquivo
 
+# uma funcao para atualizar os cursos 
+def atualizar_cursos(formulario):
+    lista_cursos = []
+    # percorrer todos os campos de cursos do formulario
+    for campo in formulario:
+        if 'curso_' in campo.name:
+            # verificar se o campo for marcado
+            if campo.data:
+                # adicionar o texto do campo.label  (Excel Impressionador) na lista de cursos
+                lista_cursos.append(campo.label.text)
+    return ';'.join(lista_cursos)
+
+
 @app.route('/perfil/editar', methods=['GET', 'POST'])
 @login_required
 def editar_perfil():
@@ -201,6 +213,8 @@ def editar_perfil():
             #print(formeditarperfil.foto_perfil.data)
             # mudar a foto do perfil
             current_user.foto_perfil = nome_imagem
+        # Atualizar os cursos do usuarios
+        current_user.cursos = atualizar_cursos(formeditarperfil)
 
         database.session.commit()
         flash(f'Perfil Atualizado com Sucesso', 'alert-success')

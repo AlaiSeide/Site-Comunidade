@@ -72,6 +72,45 @@
                         {% endif %}
                     </div>
 
+                    <hr>
+                    <legend class="text-center">Cursos</legend>
+
+                    <!--Campos dos Cursos-->
+                    <!--Percorer o meu formulario e pegar todos os campos-->
+                    {% for campo in formeditarperfil %}
+                        <!--Verificar se o curso_ está no campo-->
+                        {% if 'curso_' in campo.name %}
+                            <div class="form-group">
+                                {{ campo(class="form-check-input") }}
+                                {{ campo.label(class="orm-check-label") }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+
+                    <!--Outra forma de mostrar todos os campo dos curcos-->
+                    <!--
+                    <div class="form-group">
+                        {{ formeditarperfil.curso_python.label(class="orm-check-label") }}
+                        {{ formeditarperfil.curso_python(class="form-check-input") }}
+                    </div>
+                    <div class="form-group">
+                        {{ formeditarperfil.curso_java.label(class="orm-check-label") }}
+                        {{ formeditarperfil.curso_java(class="form-check-input") }}
+                    </div>
+                    <div class="form-group">
+                        {{ formeditarperfil.curso_javascript.label(class="orm-check-label") }}
+                        {{ formeditarperfil.curso_javascript(class="form-check-input") }}
+                    </div>
+                    <div class="form-group">
+                        {{ formeditarperfil.curso_csharp.label(class="orm-check-label") }}
+                        {{ formeditarperfil.curso_csharp(class="form-check-input") }}
+                    </div>
+                    <div class="form-group">
+                        {{ formeditarperfil.curso_ruby.label(class="orm-check-label") }}
+                        {{ formeditarperfil.curso_ruby(class="form-check-input") }}
+                    </div>
+                    -->
                 </fieldset>
 
                 <!--Botao de Corfirmacao-->

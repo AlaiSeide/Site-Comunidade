@@ -24,7 +24,8 @@ class FormCriarConta(FlaskForm):
 # formularios de fazer login
 class FormLogin(FlaskForm):
     email = StringField('E-mail', validators=[DataRequired(), Email()])
-    senha = PasswordField('Senha', validators=[DataRequired(), Length(6, 20)])
+    senha = PasswordField('Senha', id='password', validators=[DataRequired(), Length(6, 20)])
+    mostrar_senha = BooleanField('Mostrar Senha', id='check')
     lembrar_dados = BooleanField('Lembrar Dados de Acesso')
     botao_submit_login = SubmitField('Fazer Login')
 
@@ -34,6 +35,14 @@ class FormEdiarPerfil(FlaskForm):
     username = StringField('Nome de Usuário', validators=[DataRequired()])
     email = StringField('E-mail', validators=[DataRequired(), Email()])
     foto_perfil = FileField('Atualizar Foto de Perfil', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Apenas arquivos .jpg e .png são permitidos.')])
+
+    curso_excel = BooleanField('Excel Impressionador')
+    curso_python = BooleanField('Python Impressionador')
+    curso_java = BooleanField('Java Impressionador')
+    curso_javascript = BooleanField('JavaScript Impressionador')
+    curso_csharp = BooleanField('C# Impressionador')
+    curso_ruby = BooleanField('Ruby Impressionador')
+
     botao_submit_editarperfil = SubmitField('Corfirmar Edicao')
 
     # funcao de validacao antes de mudar o email do usuario
