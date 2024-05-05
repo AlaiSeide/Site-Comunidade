@@ -12,7 +12,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
-lista_usuarios = ['Alai', 'Samir', 'Onur', 'Jan']
 
 # pagina principal
 @app.route("/")
@@ -66,6 +65,10 @@ def contato():
 @login_required
 def usuarios():
     # meus_usuarios=lista_usuarios está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
+
+    # pegando todos os usuarios do meu banco de dados 
+    lista_usuarios = Usuario.query.all()
+    print(lista_usuarios)
     return render_template('usuarios.html', meus_usuarios=lista_usuarios)
 
 
@@ -184,6 +187,7 @@ def atualizar_cursos(formulario):
     lista_cursos = []
     # percorrer todos os campos de cursos do formulario
     for campo in formulario:
+        # verifica se o campo do formulario comeca com curso_
         if 'curso_' in campo.name:
             # verificar se o campo for marcado
             if campo.data:

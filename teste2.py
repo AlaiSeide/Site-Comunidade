@@ -8,17 +8,15 @@
 # Vamos ver um exemplo prático com a leitura de um arquivo:
 
 
-
-
 # Sem o with
-file = open('arquivo.txt', 'r')
-conteudo = file.read()
-print(conteudo)
-file.close()  # Precisamos lembrar de fechar o arquivo
+# file = open('arquivo.txt', 'r')
+# conteudo = file.read()
+# print(conteudo)
+# file.close()  # Precisamos lembrar de fechar o arquivo
 
-# Com o with
-with open('arquivo.txt', 'r') as file:
-    conteudo = file.read()
-    print(conteudo)
+# # Com o with
+# with open('arquivo.txt', 'r') as file:
+#     conteudo = file.read()
+#     print(conteudo)
 
 # Aqui, o arquivo já está fechado automaticamente, não precisamos nos preocupar com isso

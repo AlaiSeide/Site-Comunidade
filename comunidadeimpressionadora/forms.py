@@ -61,6 +61,7 @@ class FormEdiarPerfil(FlaskForm):
             
 
 
+
 class ContatoForm(FlaskForm):
     nome = StringField('Nome', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
