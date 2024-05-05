@@ -4,65 +4,66 @@
 
 {% block body %}
 
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="card p-3">
-        <div class="d-flex align-items-center">
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="card p-3">
+            <div class="d-flex align-items-center">
 
-            <!--Imagem do usuario-->
-            <div class="image me-4">
-                    <img src="{{ foto_perfil }}" class="rounded" width="200" >
-            </div>
+                <!--Imagem do usuario-->
+                <div class="image me-4">
+                        <img src="{{ foto_perfil }}" class="rounded" width="200" >
+                </div>
 
-            <!--Nome do usuario e o email do usuario-->
-            <div class="ml-3 w-100">
-                <!-- Nome do usuario que ta logado-->
-                <h4 class="mb-0 mt-0">{{ current_user.username }}</h4>
-                <!--O email do usuario que ta logado-->
-                <span>{{ current_user.email }}</span>
+                <!--Nome do usuario e o email do usuario-->
+                <div class="ml-3 w-100">
+                    <!-- Nome do usuario que ta logado-->
+                    <h4 class="mb-0 mt-0">{{ current_user.username }}</h4>
+                    <!--O email do usuario que ta logado-->
+                    <span>{{ current_user.email }}</span>
 
-                <!--Os cursos e os postes-->
-                <div class="p-2 mt-2 bg-primary d-flex justify-content-between rounded text-white stats">
-                    <!--Verifica se tem o texto 'Nao Informado' nos cursos do cara-->
-                    {% if 'Nao Informado' in current_user.cursos %}
+                    <!--Os cursos e os postes-->
+                    <div class="p-2 mt-2 bg-primary d-flex justify-content-between rounded text-white stats">
+                        <!--Verifica se tem o texto 'Nao Informado' nos cursos do cara-->
+                        {% if 'Nao Informado' in current_user.cursos %}
+                            <div class="d-flex flex-column">
+                                <span class="articles">Cursos</span>
+                                <!--Contar quantidade de ponto e virgulars, que vem depois de cada curso e somar um-->
+                                <span class="number1">0</span>
+                            </div>
+                        {% else %}
+                            <div class="d-flex flex-column">
+                                <span class="articles">Cursos</span>
+                                <!--Contar quantidade de ponto e virgulars, que vem depois de cada curso e somar um-->
+                                <span class="number1">{{ current_user.cursos.count(';') + 1 }}</span>
+                            </div>
+                        {% endif %}
+
                         <div class="d-flex flex-column">
-                            <span class="articles">Cursos</span>
-                            <!--Contar quantidade de ponto e virgulars, que vem depois de cada curso e somar um-->
-                            <span class="number1">0</span>
+                            <span class="rating">Posts</span>
+                            <span class="number3">0</span>
                         </div>
-                    {% else %}
-                        <div class="d-flex flex-column">
-                            <span class="articles">Cursos</span>
-                            <!--Contar quantidade de ponto e virgulars, que vem depois de cada curso e somar um-->
-                            <span class="number1">{{ current_user.cursos.count(';') + 1 }}</span>
-                        </div>
-                    {% endif %}
+                    </div>
 
-                    <div class="d-flex flex-column">
-                        <span class="rating">Posts</span>
-                        <span class="number3">0</span>
+                    <!--Botoes -->
+                    <div class="button mt-2 d-flex flex-row align-items-center">
+                        <a class="w-100" href="{{ url_for('editar_perfil') }}"><button class="btn btn-sm btn-outline-warning w-100">Editar Perfil</button></a>
                     </div>
                 </div>
 
-                <!--Botoes -->
-                <div class="button mt-2 d-flex flex-row align-items-center">
-                    <a class="w-100" href="{{ url_for('editar_perfil') }}"><button class="btn btn-sm btn-outline-warning w-100">Editar Perfil</button></a>
-                </div>
             </div>
-
         </div>
     </div>
-</div>
 
-<div class="row d-flex justify-content-center">
-    <div class="col col-4 text-center">
-        <div><strong>Cursos</strong></div>
-        <!-- Percorrer os cursos do cara e tranformar em uma lista usando o metodo split(;) -->
-        <!-- current_user.cursos é os cursos do usuarios armazenados no banco de dados -->
-        {% for curso in current_user.cursos.split(';') %}
-            <button type="button" class="btn btn-success mt-2" disabled>{{ curso }}</button>
-        {% endfor %}
+    <!-- Os Cursos do usuarios-->
+    <div class="row d-flex justify-content-center">
+        <div class="col col-4 text-center">
+            <div><strong>Cursos</strong></div>
+            <!-- Percorrer os cursos do cara e tranformar em uma lista usando o metodo split(;) -->
+            <!-- current_user.cursos é os cursos do usuarios armazenados no banco de dados -->
+            {% for curso in current_user.cursos.split(';') %}
+                <button type="button" class="btn btn-success mt-2" disabled>{{ curso }}</button>
+            {% endfor %}
+        </div>
     </div>
-</div>
 
 {% block form_editar_perfil %}
 {% endblock %}

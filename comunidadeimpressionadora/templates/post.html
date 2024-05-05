@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+
+
+
+{% block body %}
+
+    <div class="container">
+        <div class="row border mt-2 p-3" style="background-color: #f2f5f8 !important;">
+            <div class="col col-3">
+                 <!--Imagem do usuario que apostou-->
+                <div class="image me-4">
+                    <img src="{{ url_for('static', filename='fotos_perfil/{}'.format(post.autor.foto_perfil)) }}" class="rounded" width="200" >
+                    <strong>{{ post.autor.username }}</strong>
+                    <!-- Os Cursos do usuarios-->
+                    <!-- Percorrer os cursos do cara e tranformar em uma lista usando o metodo split(;) -->
+                    <!-- current_user.cursos é os cursos do usuarios armazenados no banco de dados -->
+                    
+                    <!-- {% for curso in post.autor.cursos.split(';') %}
+                        <span class="badge text-bg-success">{{ curso }}</span>
+                    {% endfor %} -->
+
+                    <div class="dropdown">
+                        <button class="btn btn-success btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                          Cursos
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          {% for curso in post.autor.cursos.split(';') %}
+                            <li><a class="dropdown-item" href="#">{{ curso }}</a></li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                </div>
+            </div>
+
+            <div class="col col-9">
+                <h3>
+                    {{ post.titulo }}
+                    <small class="text-muted fs-6">
+                        - Data de Criacao: {{ post.data_criacao.strftime('%d/%m/%Y') }}
+
+                        <!--O editar post e o exluir post so vai aparecer se o post for do usuario-->
+                        {% if formeditarpost %}
+                             - <a href="#formeditarpost" class="text-decoration-none">
+                                <i class="bi bi-pencil-square"></i>
+                                Editar Post
+                            </a> / 
+
+                        <a data-bs-toggle="modal" data-bs-target="#excluirpost" href="#" class="text-danger text-decoration-none">
+                            <i class="bi bi-trash"></i> 
+                            Excluir Post
+                        </a>
+
+                        {% endif %}
+                    </small>
+                </h3> 
+                <p>{{ post.corpo }}</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!--Formulario de editar o post-->
+    <!--Verifica se existe formulario-->
+    {% if formeditarpost %}
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <!--Formulario de Editar Post-->
+                <div class="col">
+
+                    <!--Todo formulario precisa ter um metodo post e uma acao vazia-->
+                    <form method="POST" action="" class="border p-4 mt-2" id="formeditarpost">
+                        <!--Token que devemos sempre cololar embaixo da tag form para deixar o formulario mais seguro-->
+                        {{ formeditarpost.csrf_token }}
+                        <legend class="text-center">Editar Post</legend>
+        
+                        <fieldset>
+        
+                            <!--Campo de titulo-->
+                            <div class="form-group">
+                                <!--Essas classes é do Bootstrap (class="form-control-label") -->
+                                {{ formeditarpost.titulo.label(class="form-control-label") }}
+        
+                                <!--Fazendo aparecer os erros caso tenha um erro no titulo digitado-->
+                                {% if formeditarpost.titulo.errors %}
+                                    {{ formeditarpost.titulo(class="form-control is-invalid") }}
+                                    <!--O erro-->
+                                    <div class="invalid-feedback">
+                                        {% for erro in formeditarpost.titulo.errors %}
+                                            {{ erro }}
+                                        {% endfor %}
+                                    </div>
+                                <!--Caso nao tenha nenhum erro-->    
+                                {% else %}
+                                    {{ formeditarpost.titulo(class="form-control") }}
+                                {% endif %}
+                            </div>
+        
+                            <!--Campo de corpo-->
+                            <div class="form-group">
+                                <!--Essas classes é do Bootstrap (class="form-control-label") -->
+                                {{ formeditarpost.corpo.label(class="form-control-label") }}
+        
+                                <!--Fazendo aparecer os erros caso tenha um erro no corpo digitado-->
+                                {% if formeditarpost.corpo.errors %}
+                                    {{ formeditarpost.corpo(class="form-control is-invalid") }}
+                                    <!--O erro-->
+                                    <div class="invalid-feedback">
+                                        {% for erro in formeditarpost.corpo.errors %}
+                                            {{ erro }}
+                                        {% endfor %}
+                                    </div>
+                                <!--Caso nao tenha nenhum erro-->    
+                                {% else %}
+                                    {{ formeditarpost.corpo(class="form-control") }}
+                                {% endif %}
+                            </div>
+        
+                        </fieldset>
+        
+                        <!--Botao de criar post-->
+                        {{ formeditarpost.botao_submit(class="btn btn-outline-warning mt-2") }}
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="excluirpost" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Excluir Post</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Voce quer realmente exluir esse post? (Essa acao nao pode ser desfeita)
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                    <!--O botao esta dentro de um form para ele poder exluir o post,  {{ url_for('excluir_post') }} é a minha funcao exluir post-->
+                    <!-- post.id é a minha tabela de post pegando o id do post -->
+                    <form  method="POST" action="{{ url_for('excluir_post', post_id=post.id) }}">
+                        <!--Mudar o type para submit-->
+                        <button type="submit" class="btn btn-danger">Excluir Post</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+

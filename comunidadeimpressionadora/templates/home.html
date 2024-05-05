@@ -14,11 +14,41 @@
 
         <div class="row border mt-2 p-3" style="background-color: #f2f5f8 !important;">
             <div class="col col-3">
-                imagem
+                 <!--Imagem do usuario que apostou-->
+                <div class="image me-4">
+                    <img src="{{ url_for('static', filename='fotos_perfil/{}'.format(post.autor.foto_perfil)) }}" class="rounded" width="200" >
+                    <strong>{{ post.autor.username }}</strong>
+                    <!-- Os Cursos do usuarios-->
+                    <!-- Percorrer os cursos do cara e tranformar em uma lista usando o metodo split(;) -->
+                    <!-- current_user.cursos é os cursos do usuarios armazenados no banco de dados -->
+                    
+                    <!-- {% for curso in post.autor.cursos.split(';') %}
+                        <span class="badge text-bg-success">{{ curso }}</span>
+                    {% endfor %} -->
+
+                    <div class="dropdown">
+                        <button class="btn btn-success btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                          Cursos
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          {% for curso in post.autor.cursos.split(';') %}
+                            <li><a class="dropdown-item" href="#">{{ curso }}</a></li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                      
+
+                </div>
+
             </div>
 
             <div class="col col-9">
-                <h3>{{ post.titulo }}</h3>
+                <!-- A tag <a> é usada para criar um link. O atributo 'href' define o destino do link. -->
+                  <!-- post.id é a minha tabela de post pegando o id do post -->
+                <a style="text-decoration: none;" href="{{ url_for('exibir_post', post_id=post.id ) }}">
+                  <h3>{{ post.titulo }}</h3>
+                </a>
+
                 <p>{{ post.corpo }}</p>
             </div>
         </div>
