@@ -13,7 +13,7 @@ app.config['SECRET_KEY'] = '0842ad099743ac670a2b8a9ff48f7c31'
 localhost =  '192.168.56.1'
 
 if os.getenv("DATABASE_URL"):
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://root:flashreverso20@{localhost}/comunidade'
 
