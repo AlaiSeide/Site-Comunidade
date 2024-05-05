@@ -296,11 +296,9 @@ def exibir_post(post_id):
 
 
 # Esta linha define a rota para excluir um post. Ela aceita tanto métodos GET quanto POST.
-@app.route('/post/<post_id>/excluir', methods=['GET', 'POST'])
-
+@app.route('/post/<int:post_id>/excluir', methods=['GET', 'POST'])
 # O decorador @login_required garante que o usuário deve estar logado para acessar esta rota.
 @login_required
-
 # Esta é a função que será chamada quando a rota acima for acessada.
 def excluir_post(post_id):
 
@@ -323,4 +321,3 @@ def excluir_post(post_id):
     # Se o usuário atual não for o autor do post, retornamos um erro 403 (Proibido).
     else:
         abort(403)
-
