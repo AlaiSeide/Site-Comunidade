@@ -16,7 +16,9 @@ from email.mime.text import MIMEText
 # pagina principal
 @app.route("/")
 def home():
-    return render_template('home.html')
+    posts = Post.query.all()
+
+    return render_template('home.html', posts=posts)
 
 # pagina de contato
 @app.route("/contato", methods=['GET', 'POST'])

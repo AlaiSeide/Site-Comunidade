@@ -5,7 +5,25 @@
 
 {% block body %}
     <div class="container">
-        <h1>Pagina Inicial</h1>
+        <h1 class="text-warning mt-2">Comunidade Impressionadora - Hashtag Treinamentos</h1>
+        <h2>Alunos, experts e a galera da Hashtag em um só lugar</h2>
+        <hr>
+
+        <!--Percorrer todos os posts-->
+        {%  for post in posts %}
+
+        <div class="row border mt-2 p-3" style="background-color: #f2f5f8 !important;">
+            <div class="col col-3">
+                imagem
+            </div>
+
+            <div class="col col-9">
+                <h3>{{ post.titulo }}</h3>
+                <p>{{ post.corpo }}</p>
+            </div>
+        </div>
+
+        {% endfor %}
     </div>
 {% endblock %}
 
