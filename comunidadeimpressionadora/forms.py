@@ -63,6 +63,7 @@ class FormEdiarPerfil(FlaskForm):
 
 
 class ContatoForm(FlaskForm):
+
     nome = StringField('Nome', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
 
@@ -85,3 +86,9 @@ class ContatoForm(FlaskForm):
     #         usuario = Contato.query.filter_by(email=email.data).first()
     #         if usuario:
     #             raise ValidationError('Voce ja tinha enviado uma Mensagem espera até ser respondida...')
+
+
+class FormCriarPost(FlaskForm):
+    titulo = StringField('Titulo do Post', validators=[DataRequired(), Length(2, 140)])
+    corpo = TextAreaField('Escreva seu Post Aqui', validators=[DataRequired()])
+    botao_submit = SubmitField('Criar Post')

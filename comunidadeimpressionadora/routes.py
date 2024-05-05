@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request
 from comunidadeimpressionadora import app, database, bcrypt
-from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm
-from comunidadeimpressionadora.models import Usuario, Contato
+from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm, FormCriarPost
+from comunidadeimpressionadora.models import Usuario, Contato, Post
 from flask_login import login_user, logout_user, current_user, login_required
 import secrets
 import os
@@ -155,10 +155,18 @@ def perfil():
     return render_template('perfil.html', foto_perfil=foto_perfil)
 
 # pagina de criar post
-@app.route('/post/criar')
+@app.route('/post/criar', methods=['GET', 'POST'])
 @login_required
 def criar_post():
-    return render_template('criarpost.html')
+    formcriarpost = FormCriarPost()
+
+    if formcriarpost.validate_on_submit():
+        post = Post(titulo=formcriarpost.titulo.data, corpo=formcriarpost.corpo.data, autor=current_user)
+        database.session.add(post)
+        database.session.commit()
+        flash('Post Criado com Sucesso', 'alert-success')
+        return redirect(url_for('home'))
+    return render_template('criarpost.html', formcriarpost=formcriarpost)
 
 
 # uma funcao que vai fazer todas as validacoes da imagem e salvar-la

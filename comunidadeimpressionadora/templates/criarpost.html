@@ -4,6 +4,63 @@
 
 {% block body %}
     <div class="container">
-        <h1>Criar Post</h1>
+        <div class="row d-flex justify-content-center">
+            <!--Formulario de Editar Perfil-->
+            <div class="col">
+                <!--Todo formulario precisa ter um metodo post e uma acao vazia-->
+                <form method="POST" action="" class="border p-4 mt-2">
+                    <!--Token que devemos sempre cololar embaixo da tag form para deixar o formulario mais seguro-->
+                    {{ formcriarpost.csrf_token }}
+                    <legend class="text-center">Criar Post</legend>
+    
+                    <fieldset>
+    
+                        <!--Campo de titulo-->
+                        <div class="form-group">
+                            <!--Essas classes é do Bootstrap (class="form-control-label") -->
+                            {{ formcriarpost.titulo.label(class="form-control-label") }}
+    
+                            <!--Fazendo aparecer os erros caso tenha um erro no titulo digitado-->
+                            {% if formcriarpost.titulo.errors %}
+                                {{ formcriarpost.titulo(class="form-control is-invalid") }}
+                                <!--O erro-->
+                                <div class="invalid-feedback">
+                                    {% for erro in formcriarpost.titulo.errors %}
+                                        {{ erro }}
+                                    {% endfor %}
+                                </div>
+                            <!--Caso nao tenha nenhum erro-->    
+                            {% else %}
+                                {{ formcriarpost.titulo(class="form-control") }}
+                            {% endif %}
+                        </div>
+    
+                        <!--Campo de corpo-->
+                        <div class="form-group">
+                            <!--Essas classes é do Bootstrap (class="form-control-label") -->
+                            {{ formcriarpost.corpo.label(class="form-control-label") }}
+    
+                            <!--Fazendo aparecer os erros caso tenha um erro no corpo digitado-->
+                            {% if formcriarpost.corpo.errors %}
+                                {{ formcriarpost.corpo(class="form-control is-invalid") }}
+                                <!--O erro-->
+                                <div class="invalid-feedback">
+                                    {% for erro in formcriarpost.corpo.errors %}
+                                        {{ erro }}
+                                    {% endfor %}
+                                </div>
+                            <!--Caso nao tenha nenhum erro-->    
+                            {% else %}
+                                {{ formcriarpost.corpo(class="form-control") }}
+                            {% endif %}
+                        </div>
+    
+                    </fieldset>
+    
+                    <!--Botao de criar post-->
+                    {{ formcriarpost.botao_submit(class="btn btn-outline-warning mt-2") }}
+                </form>
+            </div>
+        </div>
     </div>
 {% endblock %}
