@@ -189,6 +189,7 @@ def atualizar_cursos(formulario):
             if campo.data:
                 # adicionar o texto do campo.label  (Excel Impressionador) na lista de cursos
                 lista_cursos.append(campo.label.text)
+    # Então, se lista_cursos fosse ['Curso1', 'Curso2', 'Curso3'], a linha de código retornaria a string 'Curso1;Curso2;Curso3'. Espero que isso esclareça! Se você tiver mais perguntas, fique à vontade para
     return ';'.join(lista_cursos)
 
 
