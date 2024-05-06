@@ -26,7 +26,7 @@ Os usuários autenticados podem criar um post. O post é armazenado no banco de 
 Instalação e Uso
 Para instalar e usar esta aplicação, você precisa ter Python e Flask instalados. Clone este repositório, instale as dependências usando pip e execute o arquivo principal.
 
-git clone https://github.com/seuusuario/comunidadeimpressionadora.git
+git clone https://github.com/AlaiSeide/Site-Comunidade.git
 cd comunidadeimpressionadora
 pip install -r requirements.txt
 python main.py
