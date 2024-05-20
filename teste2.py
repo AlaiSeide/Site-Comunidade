@@ -20,3 +20,9 @@
 #     print(conteudo)
 
 # Aqui, o arquivo já está fechado automaticamente, não precisamos nos preocupar com isso
+
+
+import os
+
+temp  = os.environ['SENHA']
+print(temp)

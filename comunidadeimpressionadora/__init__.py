@@ -10,9 +10,9 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '0842ad099743ac670a2b8a9ff48f7c31'
 # localhost de Bötelkamp
-# localhost =  '192.168.56.1'
+localhost =  '192.168.56.1'
 
-localhost =  '192.168.220.130'
+#localhost =  '192.168.220.130'
 
 if os.getenv("DATABASE_URL"):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")

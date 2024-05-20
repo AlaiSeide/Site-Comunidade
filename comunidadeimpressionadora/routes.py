@@ -18,7 +18,6 @@ from email.mime.text import MIMEText
 def home():
     # ordenar os post do recentes para mais antigos order_by(Post.id.desc())
     posts = Post.query.order_by(Post.id.desc())
-
     return render_template('home.html', posts=posts)
 
 # pagina de contato
