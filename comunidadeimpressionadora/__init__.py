@@ -3,14 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 import os
-
+from flask_ import Babel
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '0842ad099743ac670a2b8a9ff48f7c31'
 # localhost de Bötelkamp
 # localhost =  '192.168.56.1'
-
+# Configurações do Flask-Babel
+app.config['BABEL_DEFAULT_LOCALE'] = 'pt'  # O idioma padrão é o português
+babel = Babel(app)
 # ip integra
 localhost =  '192.168.220.5'
 

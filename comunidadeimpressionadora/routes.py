@@ -302,6 +302,7 @@ def exibir_post(post_id):
 # Esta é a função que será chamada quando a rota acima for acessada.
 def excluir_post(post_id):
 
+
     # Aqui, estamos buscando o post com o id especificado do banco de dados.
     post = Post.query.get(post_id)
 
@@ -321,3 +322,14 @@ def excluir_post(post_id):
     # Se o usuário atual não for o autor do post, retornamos um erro 403 (Proibido).
     else:
         abort(403)
+
+
+@app.route('/configuracoes')
+def configuracoes():
+    return render_template('configuracoes.html')
+
+@app.route('/set_language/<language>')
+def set_language(language):
+    response = redirect(url_for('home'))  # Redireciona para a página inicial depois de mudar o idioma
+    response.set_cookie('lang', language)  # Define um cookie com o idioma escolhido
+    return response

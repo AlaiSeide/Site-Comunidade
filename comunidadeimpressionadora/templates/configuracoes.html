@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block body %}
+
+    <h1>Escolha o idioma</h1>
+    <ul>
+        <li><a href="{{ url_for('set_language', language='pt') }}">Português</a></li>
+        <li><a href="{{ url_for('set_language', language='en') }}">Inglês</a></li>
+        <li><a href="{{ url_for('set_language', language='de') }}">Alemão</a></li>
+    </ul>
+
+
+
+{% endblock %}

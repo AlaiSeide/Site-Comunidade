@@ -29,7 +29,7 @@ Ele vai até o #main-container (que é uma parte da sua página) e troca só ess
 
     <!-- A duplicação está ocorrendo devido ao comportamento de HTMX. Quando HTMX faz uma requisição, ele carrega o conteúdo do #main-container, mas se o conteúdo carregado também inclui a barra de navegação (já que o template é base.html), ela acaba sendo duplicada. -->
 
-
+    <!-- Se nao for uma requisicao HX ele vai mostrar a bara de navegacao sem recaregar a pagina e sem duplicar. -->
     {% if not request.headers.get('HX-Request') %}
         {% include 'navbar.html' %}
     {% endif %}
