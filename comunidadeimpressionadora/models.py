@@ -41,3 +41,10 @@ class Contato(database.Model):
     nome = database.Column(database.String(100), nullable=False)
     email = database.Column(database.String(100), nullable=False)
     mensagem = database.Column(database.Text, nullable=False)
+
+class TokenRedefinicao(database.Model):
+    id = database.Column(database.Integer, primary_key=True)
+    token = database.Column(database.String(255), nullable=False, unique=True)
+    usuario_id = database.Column(database.Integer, database.ForeignKey('usuario.id'), nullable=False)
+    usado = database.Column(database.Boolean, default=False)
+    data_expiracao = database.Column(database.DateTime, nullable=False)

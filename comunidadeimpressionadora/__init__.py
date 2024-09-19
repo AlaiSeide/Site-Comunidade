@@ -4,7 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 import os
 from flask_wtf.csrf import CSRFProtect
-
+from flask_mail import Mail
 
 
 # from flask_b import Babel
@@ -17,6 +17,15 @@ csrf = CSRFProtect(app)
 # localhost =  '192.168.56.1'
 # Configurações do Flask-Babel
 app.config['BABEL_DEFAULT_LOCALE'] = 'pt'  # O idioma padrão é o português
+senha = 'mohl sauk msjw aagc'
+# Configurações do servidor de email
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Por exemplo, se usar o Gmail
+app.config['MAIL_PORT'] = 587  # Porta para TLS
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'tenw313@gmail.com'
+app.config['MAIL_PASSWORD'] = senha  # Use uma senha de aplicativo
+mail = Mail(app)
+
 # babel = Babel(app)
 # ip integra
 localhost =  '192.168.220.5'

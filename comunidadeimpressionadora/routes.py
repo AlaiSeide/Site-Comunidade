@@ -1,18 +1,16 @@
 from flask import render_template, redirect, url_for, flash, request, abort
-from comunidadeimpressionadora import app, database, bcrypt
+from comunidadeimpressionadora import app, database, bcrypt, mail
 from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm, FormCriarPost
-from comunidadeimpressionadora.models import Usuario, Contato, Post
+from comunidadeimpressionadora.models import Usuario, Contato, Post, TokenRedefinicao
 from flask_login import login_user, logout_user, current_user, login_required
 import secrets
 import os
 from PIL import Image
 from itsdangerous import URLSafeTimedSerializer
-
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
-
+from flask_mail import Message
+from datetime import datetime
+import uuid
+from datetime import datetime, timedelta, timezone
 
 # pagina principal
 @app.route("/")
@@ -340,23 +338,46 @@ def set_language(language):
 
 # unção para gerar o token
 # Vamos criar uma função que cria uma chave especial para o usuário:
+# def gerar_token(usuario):
+#     s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+#     return s.dumps({'usuario_id': usuario.id})
+
 def gerar_token(usuario):
     s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-    return s.dumps({'usuario_id': usuario.id})
+    token_str = s.dumps({'usuario_id': usuario.id})
+    token = TokenRedefinicao(
+        token=token_str,
+        usuario_id=usuario.id,
+        data_expiracao=datetime.now(timezone.utc) + timedelta(hours=1)  # expira em 1 hora
+    )
+    database.session.add(token)
+    database.session.commit()
+    return token_str
 
-def validar_token(token, max_age=3600):
+def validar_token(token_str):
     s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     try:
-        dados = s.loads(token, max_age=max_age)
+        dados = s.loads(token_str, max_age=3600)
+        token = TokenRedefinicao.query.filter_by(token=token_str).first()
+        if token and not token.usado and token.data_expiracao >=datetime.now(timezone.utc):
+            return token
+        else:
+            return None
     except:
         return None
-    return dados
 
-def enviar_email(email, token):
-    link = url_for('redefinir_senha', token=token, _external=True)
-    # Aqui você configuraria seu serviço de email para enviar o link
-    # Por simplicidade, vamos só imprimir o link
-    print(f'Clique no link para redefinir sua senha: {link}')
+
+# def enviar_email(email, token):
+#     link = url_for('redefinir_senha', token=token, _external=True)
+#     # Aqui você configuraria seu serviço de email para enviar o link
+#     # Por simplicidade, vamos só imprimir o link
+#     print(f'Clique no link para redefinir sua senha: {link}')
+
+def enviar_email(email, assunto, template, **kwargs):
+    msg = Message(assunto, sender='noreply@comunidadeimpressionadora.com', recipients=[email])
+    msg.html = render_template(template + '.html', **kwargs)
+    mail.send(msg)
+
 
 ##############
 # Usuário diz que esqueceu a senha.
@@ -366,27 +387,57 @@ def enviar_email(email, token):
 
 # Página para o usuário dizer que esqueceu a senha
 
+# @app.route('/esqueci_senha', methods=['GET', 'POST'])
+# def esqueci_senha():
+#     if current_user.is_authenticated:
+#         # Usuário já está logado, redirecionar para a página inicial ou perfil
+#         return redirect(url_for('perfil'))  # Substitua 'inicio' pela rota adequada
+
+#     if request.method == 'POST':
+#         email = request.form['email']
+#         # Aqui vamos procurar o usuário pelo email
+#         usuario = Usuario.query.filter_by(email=email).first()
+#         # se existir usuario
+#         if usuario:
+#             # Criar um token (chave especial)
+#             token = gerar_token(usuario)
+#             # Enviar o email com o link mágico
+#             enviar_email(usuario.email, token)
+#             flash('Um email foi enviado com instruções para redefinir sua senha.', 'alert-success')
+#         else:
+#             flash('Email não encontrado.', 'alert-info')
+#         return redirect(url_for('login'))
+#     return render_template('esqueci_senha.html')
+
 @app.route('/esqueci_senha', methods=['GET', 'POST'])
 def esqueci_senha():
     if current_user.is_authenticated:
-        # Usuário já está logado, redirecionar para a página inicial ou perfil
-        return redirect(url_for('perfil'))  # Substitua 'inicio' pela rota adequada
-
+        return redirect(url_for('perfil'))
     if request.method == 'POST':
         email = request.form['email']
-        # Aqui vamos procurar o usuário pelo email
+        # Procurar o usuário pelo email
         usuario = Usuario.query.filter_by(email=email).first()
-        # se existir usuario
         if usuario:
-            # Criar um token (chave especial)
+            # Criar um token
             token = gerar_token(usuario)
-            # Enviar o email com o link mágico
-            enviar_email(usuario.email, token)
+            # Gerar o link de redefinição de senha
+            link = url_for('redefinir_senha', token=token, _external=True)
+            # Enviar o email
+            enviar_email(
+                email=usuario.email,
+                assunto='Redefinição de Senha - Comunidade Impressionadora',
+                template='email_redefinir_senha',
+                usuario=usuario,
+                link=link,
+                ano_atual=datetime.now().year
+            )
             flash('Um email foi enviado com instruções para redefinir sua senha.', 'alert-success')
+            return redirect(url_for('login'))
         else:
-            flash('Email não encontrado.', 'alert-info')
-        return redirect(url_for('login'))
+            flash('Email não encontrado.', 'alert-danger')
+            return redirect(url_for('esqueci_senha'))
     return render_template('esqueci_senha.html')
+
 
 def gerar_hash(senha):
     return bcrypt.generate_password_hash(senha)
@@ -410,6 +461,9 @@ def redefinir_senha(token):
         database.session.commit()
         flash('Sua senha foi atualizada!', 'alert-success')
         return redirect(url_for('login'))
+    # Marcar o token como usado
+    token.usado = True
+    database.session.commit()
 
     return render_template('redefinir_senha.html')
 
@@ -435,3 +489,5 @@ def alterar_senha():
         else:
             flash('Senha atual incorreta.', 'alert-danger')
     return render_template('alterar_senha.html')
+
+
