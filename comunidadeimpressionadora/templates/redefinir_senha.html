@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block body %}
+
+    <form method="POST" class="border p-4 mt-2">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label class="form-control-label">Nova Senha:</label>
+            <input class="form-control" type="password" name="senha" required>
+            <button type="submit" class="btn btn-outline-warning mt-2">Redefinir Senha</button>
+        </div>
+    </form>
+
+    
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block body %}
+
+
+    <form method="POST" class="border p-4 mt-2" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- {{ csrf_token() }} -->
+        <div class="form-group">
+            <!-- Senha Atual -->
+            <div class="mb-3">
+                <label for="senha_atual"  class="form-label">Senha Atual:</label>
+                <input class="form-control" type="password" id="senha_atual" name="senha_atual" required autocomplete="current-password">
+            </div>
+
+            <!-- Nova Senha -->
+            <div class="mb-3">
+                <label for="nova_senha" class="form-label">Nova Senha:</label>
+                <input class="form-control" type="password" id="nova_senha" name="nova_senha" required autocomplete="new-password">
+            </div>
+
+            <small class="form-text text-muted">A nova senha deve ser diferente da senha atual.</small><br>
+
+            <!-- Mostrar Senha -->
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="mostrar_senha">
+                <label class="form-check-label" for="mostrar_senha">Mostrar Senha</label>
+            </div>
+            
+            <button type="submit" class="btn btn-outline-warning mt-2">Alterar Senha</button>
+        </div>
+    </form>
+    
+    <!-- JavaScript para mostrar/ocultar senhas -->
+    <script>
+        const checkbox = document.getElementById('mostrar_senha');
+        const senhaAtual = document.getElementById('senha_atual');
+        const novaSenha = document.getElementById('nova_senha');
+
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                senhaAtual.type = 'text';
+                novaSenha.type = 'text';
+            } else {
+                senhaAtual.type = 'password';
+                novaSenha.type = 'password';
+            }
+        });
+    </script>
+{% endblock %}

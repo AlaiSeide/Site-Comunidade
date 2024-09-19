@@ -36,7 +36,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('sair') }}"><i class="bi bi-box-arrow-left"></i> Sair</a>
+                        <a hx-boost="false" class="nav-link active" aria-current="page" href="{{ url_for('sair') }}"><i class="bi bi-box-arrow-left"></i> Sair</a>
                     </li>
                 <!--Isso ai so vai aparecer se o usuario nao estiver autenticado-->
                 {% else %}

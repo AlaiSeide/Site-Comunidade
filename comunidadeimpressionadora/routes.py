@@ -6,6 +6,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 import secrets
 import os
 from PIL import Image
+from itsdangerous import URLSafeTimedSerializer
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -333,3 +334,104 @@ def set_language(language):
     response = redirect(url_for('home'))  # Redireciona para a página inicial depois de mudar o idioma
     response.set_cookie('lang', language)  # Define um cookie com o idioma escolhido
     return response
+
+
+
+
+# unção para gerar o token
+# Vamos criar uma função que cria uma chave especial para o usuário:
+def gerar_token(usuario):
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    return s.dumps({'usuario_id': usuario.id})
+
+def validar_token(token, max_age=3600):
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        dados = s.loads(token, max_age=max_age)
+    except:
+        return None
+    return dados
+
+def enviar_email(email, token):
+    link = url_for('redefinir_senha', token=token, _external=True)
+    # Aqui você configuraria seu serviço de email para enviar o link
+    # Por simplicidade, vamos só imprimir o link
+    print(f'Clique no link para redefinir sua senha: {link}')
+
+##############
+# Usuário diz que esqueceu a senha.
+# Nós enviamos um link especial para o email dele.
+# Ele clica no link e escolhe uma nova senha.
+# Atualizamos a senha na nossa caixinha.
+
+# Página para o usuário dizer que esqueceu a senha
+
+@app.route('/esqueci_senha', methods=['GET', 'POST'])
+def esqueci_senha():
+    if current_user.is_authenticated:
+        # Usuário já está logado, redirecionar para a página inicial ou perfil
+        return redirect(url_for('perfil'))  # Substitua 'inicio' pela rota adequada
+
+    if request.method == 'POST':
+        email = request.form['email']
+        # Aqui vamos procurar o usuário pelo email
+        usuario = Usuario.query.filter_by(email=email).first()
+        # se existir usuario
+        if usuario:
+            # Criar um token (chave especial)
+            token = gerar_token(usuario)
+            # Enviar o email com o link mágico
+            enviar_email(usuario.email, token)
+            flash('Um email foi enviado com instruções para redefinir sua senha.', 'alert-success')
+        else:
+            flash('Email não encontrado.', 'alert-info')
+        return redirect(url_for('login'))
+    return render_template('esqueci_senha.html')
+
+def gerar_hash(senha):
+    return bcrypt.generate_password_hash(senha)
+
+@app.route('/redefinir_senha/<token>', methods=['GET', 'POST'])
+def redefinir_senha(token):
+    if current_user.is_authenticated:
+        # Usuário já está logado, redirecionar para a página inicial ou perfil
+        return redirect(url_for('inicio'))  # Substitua 'inicio' pela rota adequada
+
+    dados = validar_token(token)
+    if not dados:
+        flash('O link para redefinir a senha é inválido ou expirou.', 'alert-danger')
+        return redirect(url_for('esqueci_senha'))
+
+    usuario = Usuario.query.get(dados['usuario_id'])
+
+    if request.method == 'POST':
+        nova_senha = request.form['senha']
+        usuario.senha = gerar_hash(nova_senha)  # Função para criptografar a senha
+        database.session.commit()
+        flash('Sua senha foi atualizada!', 'alert-success')
+        return redirect(url_for('login'))
+
+    return render_template('redefinir_senha.html')
+
+
+@app.route('/alterar_senha', methods=['GET', 'POST'])
+@login_required
+def alterar_senha():
+    if request.method == 'POST':
+        senha_atual = request.form['senha_atual']
+        nova_senha = request.form['nova_senha']
+
+        # Verificar se a senha atual está correta
+        if bcrypt.check_password_hash(current_user.senha, senha_atual):
+            # Verificar se a nova senha é diferente da atual
+            if not bcrypt.check_password_hash(current_user.senha, nova_senha):
+                # Aqui você pode adicionar verificações adicionais para a força da senha
+                current_user.senha = gerar_hash(nova_senha)
+                database.session.commit()
+                flash('Sua senha foi atualizada com sucesso!', 'alert-success')
+                return redirect(url_for('perfil'))
+            else:
+                flash('A nova senha não pode ser igual à senha atual.', 'alert-info')
+        else:
+            flash('Senha atual incorreta.', 'alert-danger')
+    return render_template('alterar_senha.html')

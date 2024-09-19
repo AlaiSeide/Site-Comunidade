@@ -9,7 +9,7 @@
             <!--Formulario de Login-->
             <div class="col">
                 <!--Todo formulario precisa ter um metodo post e uma acao vazia-->
-                <form method="POST" action="" class="border p-4 mt-2">
+                <form method="POST" action="" class="border p-4 mt-2" hx-boost="false">
 
                     <!--Token que devemos sempre cololar embaixo da tag form para deixar o formulario mais seguro-->
                     {{ form_login.csrf_token }}
@@ -55,10 +55,10 @@
                             <!--Mostrar a senha-->
                             <div class="form-group">
                                 {{ form_login.mostrar_senha.label(class="form-check-label") }}
-                                {{ form_login.mostrar_senha(class="form-check-input") }}
+                                {{ form_login.mostrar_senha(class="form-check-input", **{'hx-boost': 'false'}) }}
                             </div>
                         </div>
-
+                        <a href="{{ url_for('esqueci_senha') }}">Esqueci a Senha</a>
                         <!--Lembrar dados-->
                         <div class="form-group">
                             {{ form_login.lembrar_dados.label(class="form-check-label") }}
@@ -74,7 +74,7 @@
             <!--Formulario de criar conta-->
             <div class="col">
                 <!--Todo formulario precisa ter um metodo post e uma acao vazia-->
-                <form method="POST" action="" class="border p-4 mt-2">
+                <form method="POST" action="" class="border p-4 mt-2" hx-boost="false"> 
 
                     <!--Token que devemos sempre cololar embaixo da tag form para deixar o formulario mais seguro-->
                     {{ form_criarconta.csrf_token }}
@@ -151,7 +151,9 @@
                     {{ form_criarconta.botao_submit_criarconta(class="btn btn-outline-warning mt-2") }}
                 </form>
             </div>
+
         </div>
     </div>
+
 
 {% endblock %}
