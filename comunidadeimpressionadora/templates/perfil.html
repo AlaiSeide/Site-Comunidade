@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 
-
 {% block body %}
 
     <div class="container mt-5 d-flex justify-content-center">
@@ -45,8 +44,20 @@
 
                     <!--Botoes -->
                     <div class="button mt-2 d-flex flex-row align-items-center">
-                        <a class="w-100" href="{{ url_for('editar_perfil') }}"><button class="btn btn-sm btn-outline-warning w-100">Editar Perfil</button></a>
+                        <a class="w-100" href="{{ url_for('editar_perfil') }}">
+                            <button class="btn btn-sm btn-outline-warning w-100">
+                                Editar Perfil
+                            </button>
+                        </a>
                     </div>
+
+                    <!-- Botão que abre o modal -->
+                    <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-1" data-bs-toggle="modal"               data-bs-target="#excluirContaModal">
+                        Excluir Conta
+                    </button>
+                    <!-- Incluir o modal de exclusão de conta -->
+                    {% include 'modal_excluir_conta.html' %}
+
                 </div>
 
             </div>

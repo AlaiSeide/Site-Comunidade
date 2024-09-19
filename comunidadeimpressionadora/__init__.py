@@ -29,11 +29,12 @@ mail = Mail(app)
 # babel = Babel(app)
 # ip integra
 localhost =  '192.168.220.5'
+botelkampip = '192.168.178.7'
 
 if os.getenv("DATABASE_URL"):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://alaiseide:Flashreverso2020..@{localhost}/comunidade'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://alaiseide:Flashreverso2020..@{botelkampip}/comunidade'
 
 
 # Configuração da URI do banco de dados SQLite

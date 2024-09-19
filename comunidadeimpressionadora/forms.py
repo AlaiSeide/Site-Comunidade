@@ -89,6 +89,10 @@ class ContatoForm(FlaskForm):
 
 
 class FormCriarPost(FlaskForm):
+
     titulo = StringField('Titulo do Post', validators=[DataRequired(), Length(2, 140)])
     corpo = TextAreaField('Escreva seu Post Aqui', validators=[DataRequired()])
     botao_submit = SubmitField('Criar Post')
+
+class DeleteAccountForm(FlaskForm):
+   pass  # Não precisa adicionar campos, mas mantém o CSRF ativo

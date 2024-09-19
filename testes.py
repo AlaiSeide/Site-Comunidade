@@ -1,5 +1,5 @@
 from comunidadeimpressionadora import app, database
-from comunidadeimpressionadora.models import Usuario, Post, Contato
+from comunidadeimpressionadora.models import Usuario, Post, Contato, TokenRedefinicao
 
 
 with app.app_context():

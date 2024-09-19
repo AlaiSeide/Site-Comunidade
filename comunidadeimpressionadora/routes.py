@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request, abort
 from comunidadeimpressionadora import app, database, bcrypt, mail
-from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm, FormCriarPost
+from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm, FormCriarPost, DeleteAccountForm
 from comunidadeimpressionadora.models import Usuario, Contato, Post, TokenRedefinicao
 from flask_login import login_user, logout_user, current_user, login_required
 import secrets
@@ -152,9 +152,10 @@ def sair():
 @app.route('/perfil')
 @login_required
 def perfil():
+    delete_account_form = DeleteAccountForm()
     foto_perfil = f'/static/fotos_perfil/{current_user.foto_perfil}'
     # foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
-    return render_template('perfil.html', foto_perfil=foto_perfil)
+    return render_template('perfil.html', foto_perfil=foto_perfil, delete_account_form=delete_account_form)
 
 # pagina de criar post
 @app.route('/post/criar', methods=['GET', 'POST'])
@@ -210,10 +211,9 @@ def atualizar_cursos(formulario):
 @app.route('/perfil/editar', methods=['GET', 'POST'])
 @login_required
 def editar_perfil():
-
+    delete_account_form = DeleteAccountForm()
     # uma instancia da minha classe FormEdiarPerfil
     formeditarperfil = FormEdiarPerfil()
-
     # validar o meu formulario
     if formeditarperfil.validate_on_submit():
         # mudar o email e o username do usuario
@@ -248,7 +248,7 @@ def editar_perfil():
     
     foto_perfil = f'/static/fotos_perfil/{current_user.foto_perfil}'
     # foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
-    return render_template('editarperfil.html', foto_perfil=foto_perfil, formeditarperfil=formeditarperfil)
+    return render_template('editarperfil.html', foto_perfil=foto_perfil, formeditarperfil=formeditarperfil, delete_account_form=delete_account_form)
 
 
 
@@ -359,7 +359,7 @@ def validar_token(token_str):
     try:
         dados = s.loads(token_str, max_age=3600)
         token = TokenRedefinicao.query.filter_by(token=token_str).first()
-        if token and not token.usado and token.data_expiracao >=datetime.now(timezone.utc):
+        if token and not token.usado and token.data_expiracao >= datetime.now(timezone.utc):
             return token
         else:
             return None
@@ -446,7 +446,7 @@ def gerar_hash(senha):
 def redefinir_senha(token):
     if current_user.is_authenticated:
         # Usuário já está logado, redirecionar para a página inicial ou perfil
-        return redirect(url_for('inicio'))  # Substitua 'inicio' pela rota adequada
+        return redirect(url_for('home'))  # Substitua 'inicio' pela rota adequada
 
     dados = validar_token(token)
     if not dados:
@@ -461,6 +461,7 @@ def redefinir_senha(token):
         database.session.commit()
         flash('Sua senha foi atualizada!', 'alert-success')
         return redirect(url_for('login'))
+    
     # Marcar o token como usado
     token.usado = True
     database.session.commit()
@@ -491,3 +492,31 @@ def alterar_senha():
     return render_template('alterar_senha.html')
 
 
+# @app.route('/excluir_conta', methods=['GET', 'POST'])
+# @login_required
+# def excluir_conta():
+#     form = DeleteAccountForm()
+#     if form.validate_on_submit():
+#         user = Usuario.query.get(current_user.id)
+#         database.session.delete(user)
+#         database.session.commit()
+#         logout_user()
+#         flash('Sua conta e todo o seu conteúdo foram excluídos.', 'alert-success')
+#         return redirect(url_for('home'))
+#     return render_template('excluir_conta.html', form=form)
+
+@app.route('/excluir_conta',  methods=['GET', 'POST'])
+@login_required
+def excluir_conta():
+    delete_account_form = DeleteAccountForm()
+    if delete_account_form.validate_on_submit():
+        user = Usuario.query.get(current_user.id)
+        print(user)
+        database.session.delete(user)
+        database.session.commit()
+        logout_user()
+        flash('Sua conta e todo o seu conteúdo foram excluídos.', 'alert-success')
+        return redirect(url_for('home'))
+    else:
+        flash('Requisição inválida.', 'alert-danger')
+        return redirect(url_for('perfil'))

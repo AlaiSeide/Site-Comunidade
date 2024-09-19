@@ -1,0 +1,27 @@
+<!-- templates/modal_excluir_conta.html -->
+<div class="modal fade" id="excluirContaModal" tabindex="-1" aria-labelledby="excluirContaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            
+           
+            <div class="modal-header">
+                <h5 class="modal-title" id="excluirContaModalLabel">Excluir Conta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body">
+                Tem certeza de que deseja excluir sua conta? Esta ação não pode ser desfeita.
+            </div>
+
+            <div class="modal-footer">
+                <form action="{{ url_for('excluir_conta') }}" method="post">
+                    {{ delete_account_form.csrf_token }}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir Conta</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+  

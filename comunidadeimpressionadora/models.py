@@ -18,7 +18,10 @@ class Usuario(database.Model, UserMixin):
     senha = database.Column(database.String(80), nullable=False)
     foto_perfil = database.Column(database.String(50), nullable=False, default='default.jpg')
     # esse backref='autor' é para depois na tabela Post eu poder descobrir o autor do post
-    posts = database.relationship('Post', backref='autor', lazy=True)
+
+    # Nota Importante: Ao definir cascade='all, delete-orphan', você garante que quando um usuário for excluído, todos os posts associados a ele também serão excluídos automaticamente. Assim, não é necessário deletar os posts manualmente na rota.
+
+    posts = database.relationship('Post', backref='autor', lazy=True, cascade='all, delete-orphan')
     cursos = database.Column(database.String(500), nullable=False, default='Nao Informado')
 
     # quantidade de post que o cara tem
