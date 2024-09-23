@@ -22,7 +22,36 @@
 # Aqui, o arquivo já está fechado automaticamente, não precisamos nos preocupar com isso
 
 
-import os
+# import os
 
-temp  = os.environ['SENHA']
-print(temp)
+# temp  = os.environ['SENHA']
+# print(temp)
+
+# print(len('$2b$12$QyJPU76ZQJlAqMooSZZBv.rYzYtkxVqJDCdXS/vSjXCuuAwuysmme'))
+
+
+
+
+
+# Armazene sempre em UTC (datetime.now(timezone.utc)).
+# Converta para o fuso horário local (como Hamburgo) apenas quando for exibir ou usar o horário para interações com o usuário.
+
+
+ # Calcula a data de expiração (1 hora a partir de agora)
+from datetime import datetime, timedelta, timezone
+data_expiracao = datetime.now(timezone.utc) + timedelta(hours=1)
+print(f'Data Expiracao: {data_expiracao.strftime('%Y-%m-%d %H:%M:%S %Z')}')
+
+print(f'UTC: {datetime.now(timezone.utc)}')
+
+from zoneinfo import ZoneInfo
+import zoneinfo
+# Supondo que a hora UTC foi recuperada do banco de dados
+hora_utc = datetime.now(timezone.utc)
+
+# Convertendo para o fuso horário de Hamburgo
+fuso_hamburgo = ZoneInfo("Europe/Berlin")  # Fuso horário da Alemanha
+hora_local = hora_utc.astimezone(fuso_hamburgo)
+
+print(f'Hora Local: {hora_local}')
+

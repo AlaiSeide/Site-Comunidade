@@ -1,0 +1,52 @@
+/* static/css/styles.css */
+
+/* Estilo para o link de Voltar para a Página Principal */
+.custom-back-link {
+    color: #0d6efd; /* Cor padrão do Bootstrap Primary */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease, transform 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.custom-back-link:hover {
+    color: #084298; /* Cor mais escura no hover */
+    transform: scale(1.05); /* Leve aumento de tamanho */
+    text-decoration: underline; /* Sublinhado no hover */
+}
+
+/* Estilo para botões de ação nos cards */
+.card-body .btn {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card-body .btn:hover {
+    background-color: #0b5ed7;
+    color: #fff;
+}
+
+/* Estilo para os cards */
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+/* Estilo para os headers dos cards */
+.card-header i {
+    font-size: 1.3rem;
+}
+
+/* Responsividade para o título principal */
+h2 {
+    font-weight: 700;
+}
+
+/* Estilo para o botão de leitura da política */
+.btn-outline-secondary {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: #fff;
+}

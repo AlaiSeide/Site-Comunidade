@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo à Comunidade!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #0d6efd;
+        }
+        .button {
+            display: inline-block;
+            background-color: #0d6efd;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bem-vindo à Comunidade, {{ usuario.username }}!</h1>
+        <p>Estamos muito felizes por você ter se juntado a nós! Agora você faz parte de uma comunidade incrível.</p>
+        <p>Clique no link abaixo para acessar seu perfil e começar a explorar o conteúdo disponível:</p>
+        <p><a href="{{ url_for('perfil', _external=True) }}" class="button">Acessar Perfil</a></p>
+        <p>Se você tiver alguma dúvida, estamos à disposição!</p>
+        <p>Atenciosamente,<br>Equipe Comunidade</p>
+        <div class="footer">
+            <p>Este é um e-mail automático, por favor, não responda.</p>
+        </div>
+    </div>
+</body>
+</html>

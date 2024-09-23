@@ -5,6 +5,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
 from comunidadeimpressionadora.models import Usuario, Contato
 from flask_login import current_user
+from comunidadeimpressionadora import bcrypt
 
 # Formularios de criar conta
 class FormCriarConta(FlaskForm):
@@ -16,9 +17,9 @@ class FormCriarConta(FlaskForm):
 
     # funcao de validacao para um email unico no banco de dados
     def validate_email(self, email):
-        usuario = Usuario.query.filter_by(email=email.data).first()
-        if usuario:
-            raise ValidationError('E-mail já cadastrado. Cadastre-se com outro e-mail ou faça login para continuar')
+        usuario = Usuario.query.filter_by(email=email.data).first()  # Verifica no banco de dados se o e-mail já existe
+        if usuario: # Se já existir, retorna um erro
+            raise ValidationError('E-mail já cadastrado. Cadastre-se com outro e-mail ou faça login para continuar') 
 
 
 # formularios de fazer login
@@ -60,8 +61,6 @@ class FormEdiarPerfil(FlaskForm):
                 raise ValidationError('Já existe um usuário com esse E-mail. Por favor, cadastre outro E-mail.')
             
 
-
-
 class ContatoForm(FlaskForm):
 
     nome = StringField('Nome', validators=[DataRequired()])
@@ -96,3 +95,57 @@ class FormCriarPost(FlaskForm):
 
 class DeleteAccountForm(FlaskForm):
    pass  # Não precisa adicionar campos, mas mantém o CSRF ativo
+
+
+
+# Definição dos formulários
+
+class EsqueciSenhaForm(FlaskForm):
+    """
+    Formulário para solicitar a redefinição de senha.
+    """
+    email = StringField('Email', validators=[DataRequired(), Email()])  # Campo para digitar o email
+    submit = SubmitField('Enviar')  # Botão para enviar o formulário
+
+class RedefinirSenhaForm(FlaskForm):
+    """
+    Formulário para redefinir a senha.
+    """
+    senha = PasswordField('Nova Senha', validators=[DataRequired()])  # Campo para a nova senha
+    confirmar_senha = PasswordField('Confirmar Nova Senha', validators=[DataRequired(), EqualTo('senha')])  # Campo para confirmar a senha
+    submit = SubmitField('Redefinir Senha')  # Botão para enviar a nova senha
+
+    # nao funciona porque o usuario nao esta logado, e o current_user so sabe a senha do usuario se ele estiver logado.
+    # def validate_senha(self, senha):
+    #     # Aqui você busca o usuário atual no banco e verifica se a nova senha é igual à antiga
+    #     if bcrypt.check_password_hash(current_user.senha, senha):
+    #         raise ValidationError('A nova senha não pode ser igual à antiga.')
+
+
+class AlterarSenhaForm(FlaskForm):
+    senha_atual = PasswordField('Senha Atual', validators=[DataRequired()])
+    nova_senha = PasswordField('Nova Senha', validators=[DataRequired(), Length(min=8, message='A senha deve ter pelo menos 8 caracteres.')])
+    confirmar_nova_senha = PasswordField('Confirmar Nova Senha', validators=[DataRequired(), EqualTo('nova_senha', message='As senhas devem corresponder.')])
+    submit = SubmitField('Alterar Senha')
+
+    def validate_nova_senha(self, nova_senha):
+        # se a senha atual é igual a nova senha que o usuario digitou no formulario
+        if bcrypt.check_password_hash(current_user.senha, nova_senha.data):
+            raise ValidationError('A nova senha não pode ser igual à senha atual.')
+
+    def validate_senha_atual(self, senha_atual):
+        # se a senha atual é diferente da senha s´do usuario que está armazenado no banco de dados.
+        if not bcrypt.check_password_hash(current_user.senha, senha_atual.data):
+            raise ValidationError('Senha atual incorreta.')
+        
+# Formulário para o usuário inserir o código de confirmação
+class ConfirmacaoEmailForm(FlaskForm):
+   # Criamos 6 campos de um dígito para o código de confirmação
+    code1 = StringField('Código 1', validators=[DataRequired(), Length(min=1, max=1)])
+    code2 = StringField('Código 2', validators=[DataRequired(), Length(min=1, max=1)])
+    code3 = StringField('Código 3', validators=[DataRequired(), Length(min=1, max=1)])
+    code4 = StringField('Código 4', validators=[DataRequired(), Length(min=1, max=1)])
+    code5 = StringField('Código 5', validators=[DataRequired(), Length(min=1, max=1)])
+    code6 = StringField('Código 6', validators=[DataRequired(), Length(min=1, max=1)])
+    
+    submit = SubmitField('Confirmar')

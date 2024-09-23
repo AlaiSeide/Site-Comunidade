@@ -1,48 +1,100 @@
 {% extends 'base.html' %}
+
+
+{% block head %}
+    <!-- Link para CSS personalizado -->
+    <style>
+        /* Estilos para o link de Voltar para o Perfil */
+        .back-to-profile-link {
+            color: orange; /* Cor padrão do Bootstrap Primary */
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .back-to-profile-link:hover {
+            color: #c8ac1c; /* Cor mais escura no hover */
+            transform: scale(1.05); /* Leve aumento de tamanho */
+            text-decoration: underline; /* Sublinhado no hover */
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
 
+    <div class="container">
 
-    <form method="POST" class="border p-4 mt-2" autocomplete="off">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <!-- {{ csrf_token() }} -->
-        <div class="form-group">
-            <!-- Senha Atual -->
-            <div class="mb-3">
-                <label for="senha_atual"  class="form-label">Senha Atual:</label>
-                <input class="form-control" type="password" id="senha_atual" name="senha_atual" required autocomplete="current-password">
-            </div>
-
-            <!-- Nova Senha -->
-            <div class="mb-3">
-                <label for="nova_senha" class="form-label">Nova Senha:</label>
-                <input class="form-control" type="password" id="nova_senha" name="nova_senha" required autocomplete="new-password">
-            </div>
-
-            <small class="form-text text-muted">A nova senha deve ser diferente da senha atual.</small><br>
-
-            <!-- Mostrar Senha -->
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" id="mostrar_senha">
-                <label class="form-check-label" for="mostrar_senha">Mostrar Senha</label>
-            </div>
+        <div class="row">
+            <!-- Formulário para alterar a senha -->
+            <form method="POST" class="border p-4 mt-2" autocomplete="off" action="{{ url_for('alterar_senha') }}">
+                {{ form.hidden_tag() }}  <!-- Protege contra CSRF -->
+                <legend>Alterar Senha</legend>
+                <fieldset>
+                    <!-- Senha Atual -->
+                    <div class="form-group">
+                        {{ form.senha_atual.label(class="form-label") }}<br>
+                        {{ form.senha_atual(class="form-control", id="senha_atual") }}<br>
+                        {% for error in form.senha_atual.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <!-- Nova Senha -->
+                    <div class="form-group">
+                        {{ form.nova_senha.label(class="form-label") }}<br>
+                        {{ form.nova_senha(class="form-control", id="nova_senha") }}<br>
+                        {% for error in form.nova_senha.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <!-- Confirmar senha -->
+                    <div class="form-group">
+                        {{ form.confirmar_nova_senha.label(class="form-label") }}<br>
+                        {{ form.confirmar_nova_senha(class="form-control", id="confirmar_senha") }}<br>
+                        {% for error in form.confirmar_nova_senha.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
             
-            <button type="submit" class="btn btn-outline-warning mt-2">Alterar Senha</button>
+                    <!-- Mostrar Senha -->
+                    <div class="form-group">
+                        <input class="form-check-input" type="checkbox" id="mostrar_senha">
+                        <label class="form-check-label" for="mostrar_senha">Mostrar Senha</label>
+                    </div>
+                </fieldset>
+                    <small class="form-text text-muted">A nova senha deve ser diferente da senha atual.</small><br>
+                    <p>{{ form.submit(class="btn btn-outline-warning mt-2") }}</p>
+
+                    <!-- Link para voltar à página de perfil ou outra página -->
+                    <a href="{{ url_for('perfil') }}"  class="back-to-profile-link d-flex align-items-center">
+                        <i class="bi bi-person-circle me-2"></i>
+                        Voltar para o Perfil
+                    </a>
+            </form>
+            
         </div>
-    </form>
+    </div>
+
+ 
+    
+
+
     
     <!-- JavaScript para mostrar/ocultar senhas -->
     <script>
         const checkbox = document.getElementById('mostrar_senha');
         const senhaAtual = document.getElementById('senha_atual');
         const novaSenha = document.getElementById('nova_senha');
+        const confirmar_senha = document.getElementById('confirmar_senha')
 
         checkbox.addEventListener('change', function() {
             if (this.checked) {
                 senhaAtual.type = 'text';
                 novaSenha.type = 'text';
+                confirmar_senha.type = 'text';
             } else {
                 senhaAtual.type = 'password';
                 novaSenha.type = 'password';
+                confirmar_senha.type = 'password';
             }
         });
     </script>

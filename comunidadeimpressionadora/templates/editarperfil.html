@@ -1,5 +1,24 @@
 {% extends 'perfil.html' %}
 
+
+{% block head %}
+    <style>
+        /* Estilos para o link de Alterar Senha */
+        .change-password-link {
+            color: orange; /* Cor padrão do Bootstrap Primary */
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .change-password-link:hover {
+            color: #8e6215; /* Cor mais escura no hover */
+            transform: scale(1.05); /* Leve aumento de tamanho */
+            text-decoration: underline; /* Sublinhado no hover */
+        }
+    </style>
+{% endblock %}
+
 {% block form_editar_perfil %}
 
 <div class="container">
@@ -56,7 +75,10 @@
                         {% endif %}
                     </div>
 
-                    <a href="{{ url_for('alterar_senha') }}">alterar_senha</a>
+                    <a href="{{ url_for('alterar_senha') }}" class="change-password-link d-flex align-items-center">
+                        <i class="bi bi-lock me-2"></i>
+                        alterar_senha
+                    </a>
                     
                     
                     <!--Campo de Imagem-->

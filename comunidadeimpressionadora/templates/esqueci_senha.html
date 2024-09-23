@@ -1,14 +1,32 @@
 {% extends 'base.html' %}
 {% block body %}
 
-    <form method="POST" class="border p-4 mt-2">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="form-group">
-            <label class="form-control-label">Email:</label>
-            <input type="email" name="email" required class="form-control">
-            <button type="submit" class="btn btn-outline-warning mt-2">Enviar</button>
-        </div>
-    </form>
     
+    <div class="container">
+        <div class="row">
+
+            <!-- Formulário para solicitar a redefinição de senha -->
+            <form method="POST" class="border p-4 mt-2">
+                {{ form.hidden_tag() }}  <!-- Protege contra CSRF -->
+                <legend class="text-center">Esqueci Minha Senha</legend>
+                <fieldset>
+                    <div class="form-group">
+                        {{ form.email.label(class="form-control-label") }}
+                        {{ form.email(class="form-control") }}  <!-- Campo para digitar o email -->
+                    </div>
+                </fieldset>
+            
+                {{ form.submit(class="btn btn-outline-warning mt-2") }} <!-- Botão de envio -->
+
+                 <!-- Link para voltar à página principal -->
+                <a href="{{ url_for('home') }}"  class="d-flex align-items-center text-decoration-none mt-2 text-warning">
+                    <i class="bi bi-arrow-left-circle me-2"></i>
+                    Voltar para a página principal
+                </a>
+               
+            </form>
+
+        </div>
+    </div>
 
 {% endblock %}

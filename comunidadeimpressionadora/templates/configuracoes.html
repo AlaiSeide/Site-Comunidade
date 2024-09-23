@@ -1,13 +1,83 @@
+<!-- templates/configuracoes.html -->
+
 {% extends 'base.html' %}
+{% block title %}Configurações - Meu Blog Community{% endblock %}
+
 {% block body %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Configurações</h2>
 
-    <h1>Escolha o idioma</h1>
-    <ul>
-        <li><a href="{{ url_for('set_language', language='pt') }}">Português</a></li>
-        <li><a href="{{ url_for('set_language', language='en') }}">Inglês</a></li>
-        <li><a href="{{ url_for('set_language', language='de') }}">Alemão</a></li>
-    </ul>
+    <!-- Seleção de Idioma -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <i class="bi bi-translate me-2"></i>
+            Escolha o Idioma
+        </div>
+        <div class="card-body">
+            <div class="btn-group" role="group" aria-label="Idioma">
+                <a href="#" class="btn btn-outline-primary">Português</a>
+                <a href="#" class="btn btn-outline-primary">Inglês</a>
+                <a href="#" class="btn btn-outline-primary">Alemão</a>
+            </div>
+        </div>
+    </div>
 
+    <!-- Seções: Sobre o Site e Política de Privacidade -->
+    <div class="row">
+        <!-- Seção Sobre o Site -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    Sobre o Site
+                </div>
+                <div class="card-body">
+                    <p>
+                        Bem-vindo à <strong>Meu Blog Community</strong>, uma plataforma dedicada a entusiastas de blogs onde você pode
+                        criar, gerenciar e participar de discussões sobre diversos tópicos e conteúdos. Nossa missão é proporcionar um ambiente
+                        seguro, transparente e inspirador para que membros da comunidade possam interagir, compartilhar conhecimento e crescer juntos.
+                    </p>
+                    <p>
+                        Nossa comunidade valoriza a integridade, o respeito mútuo e a colaboração. Junte-se a nós e faça parte de um grupo vibrante
+                        de pessoas que compartilham o amor por blogs criativos e enriquecedores.
+                    </p>
+                </div>
+            </div>
+        </div>
 
+        <!-- Seção Política e Privacidade -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-shield-lock-fill me-2"></i>
+                    Política e Privacidade
+                </div>
+                <div class="card-body">
+                    <p>
+                        Na <strong>Meu Blog Community</strong>, a sua privacidade e segurança são nossas prioridades. Nós nos comprometemos a
+                        proteger suas informações pessoais e garantir que suas interações na plataforma sejam seguras e respeitosas.
+                    </p>
+                    <p>
+                        Nossa política de privacidade detalha como coletamos, usamos e protegemos seus dados. Recomendamos que você leia atentamente
+                        nossas diretrizes para entender melhor como mantemos a confidencialidade e a integridade das suas informações.
+                    </p>
+                    <a href="{{ url_for('politica_privacidade') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        Ler Política e Privacidade
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Link Personalizado para Voltar à Página Principal -->
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a href="{{ url_for('perfil') }}" class="btn btn-link custom-back-link d-inline-flex align-items-center">
+                <i class="bi bi-house-fill me-2"></i>
+                Voltar para a Página Principal
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

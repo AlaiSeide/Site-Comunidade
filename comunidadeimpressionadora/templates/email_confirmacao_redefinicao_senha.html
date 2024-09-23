@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinição de Senha Bem-Sucedida</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #28a745;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Olá, {{ usuario.username }}!</h1>
+        <p>Sua senha foi redefinida com sucesso. A partir de agora, você poderá acessar sua conta usando a nova senha.</p>
+        <p>Se você não reconhece essa alteração, entre em contato conosco imediatamente para garantir a segurança da sua conta.</p>
+        <a href="{{ url_for('perfil', _external=True) }}" class="button">Acessar Perfil</a>
+        <div class="footer">
+            <p>Este é um e-mail automático, por favor, não responda.</p>
+            <p>Atenciosamente, <br> Equipe Comunidade Impressionadora</p>
+        </div>
+    </div>
+</body>
+</html>
