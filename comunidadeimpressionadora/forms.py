@@ -93,8 +93,10 @@ class FormCriarPost(FlaskForm):
     corpo = TextAreaField('Escreva seu Post Aqui', validators=[DataRequired()])
     botao_submit = SubmitField('Criar Post')
 
-class DeleteAccountForm(FlaskForm):
-   pass  # Não precisa adicionar campos, mas mantém o CSRF ativo
+class ConfirmarExclusaoContaForm(FlaskForm):
+    senha = PasswordField('Senha', validators=[DataRequired()])  # Campo para a senha
+    confirmacao = BooleanField('Eu confirmo que quero excluir a conta.', validators=[DataRequired()])  # Checkbox de confirmação
+    submit = SubmitField('Excluir Conta')
 
 
 
@@ -149,3 +151,6 @@ class ConfirmacaoEmailForm(FlaskForm):
     code6 = StringField('Código 6', validators=[DataRequired(), Length(min=1, max=1)])
     
     submit = SubmitField('Confirmar')
+
+# class ConfirmarExclusaoContaForm(FlaskForm):
+    

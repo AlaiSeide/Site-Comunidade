@@ -1,0 +1,36 @@
+<!-- templates/confirmar_exclusao.html -->
+{% extends 'base.html' %}
+
+
+{% block title %}
+    Confirmação de Exclusão de Conta
+{% endblock %}
+
+{% block body %}
+
+    <div class="container mt-5">
+        <h1>Confirmação de Exclusão de Conta</h1>
+        <p>Para sua segurança, confirme sua senha e marque a opção abaixo para excluir sua conta.</p>
+        <form method="POST" action="{{ url_for('confirmar_exclusao') }}">
+            {{ form.hidden_tag() }}
+            
+            <!-- Campo para inserir a senha -->
+            <div class="mb-3">
+                <label for="password" class="form-label">Confirme sua senha</label>
+                {{ form.senha(class="form-control", type="password", id="password", placeholder="Sua senha") }}
+            </div>
+
+            <!-- Checkbox para confirmação adicional -->
+            <div class="form-check mb-3">
+                {{ form.confirmacao(class="form-check-input", id="confirmCheckbox") }}
+                <label class="form-check-label" for="confirmCheckbox">
+                    Eu confirmo que desejo excluir permanentemente minha conta.
+                </label>
+            </div>
+
+            <a href="{{ url_for('perfil') }}" class="btn btn-secondary">Cancelar</a>
+            {{ form.submit(class="btn btn-danger") }}
+        </form>
+    </div>
+
+{% endblock %}

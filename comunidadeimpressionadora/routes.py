@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request, abort, session
 from comunidadeimpressionadora import app, database, bcrypt
-from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm, FormCriarPost, DeleteAccountForm, EsqueciSenhaForm, RedefinirSenhaForm, AlterarSenhaForm, ConfirmacaoEmailForm
+from comunidadeimpressionadora.forms import FormCriarConta, FormLogin, FormEdiarPerfil, ContatoForm, FormCriarPost, ConfirmarExclusaoContaForm, EsqueciSenhaForm, RedefinirSenhaForm, AlterarSenhaForm, ConfirmacaoEmailForm
 from comunidadeimpressionadora.models import Usuario, Contato, Post
 from flask_login import login_user, logout_user, current_user, login_required
 import secrets
@@ -8,7 +8,7 @@ import os
 from functools import wraps
 from PIL import Image
 from .forgotpassword import gerar_token, validar_token, enviar_email
-from datetime import datetime
+from datetime import datetime, timezone
 from comunidadeimpressionadora.utils import enviar_email_bem_vindo, enviar_email_alteracao_senha, enviar_email_exclusao_conta, enviar_email_confirmacao_redefinicao_senha, enviar_email_confirmacao, confirmar_token, gerar_codigo_confirmacao
 
 # from flask_babel import gettext
@@ -115,7 +115,7 @@ def login():
                     return redirect(url_for("home"))
             else:
                 flash(f'Por favor, confirme o seu e-mail para poder acessar sua conta e fazer login.','alert-info')
-                return redirect(url_for("login"))
+                return redirect(url_for("unconfirmed"))
         else:
             flash(f'Falha no Login. E-mail ou Senha Incorretos.','alert-danger')
 
@@ -180,7 +180,7 @@ def confirmar_email(token):
         ])
         if codigo_digitado == usuario.codigo_confirmacao:  # Verifica se o código está correto
             usuario.confirmado = True  # Marca o usuário como confirmado
-            usuario.data_confirmacao = datetime.utcnow()  # Salva a data de confirmação
+            usuario.data_confirmacao = datetime.now(timezone.utc)  # Salva a data de confirmação
             database.session.commit()  # Salva as mudanças no banco de dados
             flash('Sua conta foi confirmada! Agora você pode fazer login.', 'alert-success')  # Mensagem de sucesso
             return redirect(url_for('login'))  # Redireciona para a página de login
@@ -219,10 +219,9 @@ def sair():
 @app.route('/perfil')
 @login_required
 def perfil():
-    delete_account_form = DeleteAccountForm()
     foto_perfil = f'/static/fotos_perfil/{current_user.foto_perfil}'
     # foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
-    return render_template('perfil.html', foto_perfil=foto_perfil, delete_account_form=delete_account_form)
+    return render_template('perfil.html', foto_perfil=foto_perfil)
 
 # pagina de criar post
 @app.route('/post/criar', methods=['GET', 'POST'])
@@ -550,23 +549,71 @@ def alterar_senha():
 #         return redirect(url_for('home'))
 #     return render_template('excluir_conta.html', form=form)
 
-@app.route('/excluir_conta',  methods=['GET', 'POST'])
+# @app.route('/excluir_conta',  methods=['GET', 'POST'])
+# @login_required
+# def excluir_conta():
+#     # Usamos o formulário com senha e checkbox de confirmação
+#     delete_account_form = DeleteAccountForm()
+
+#     if delete_account_form.validate_on_submit():
+#         # Verificar se a senha fornecida está correta
+#         if not bcrypt.check_password_hash(current_user.senha, delete_account_form.senha.data):
+#             flash('Senha incorreta. Tente novamente.', 'alert-danger')
+#             return redirect(url_for('excluir_conta'))
+        
+#         # Verificar se o checkbox foi marcado
+#         if not delete_account_form.confirmacao.data:
+#             flash('Você deve marcar a caixa de confirmação para excluir sua conta.', 'alert-danger')
+#             return redirect(url_for('excluir_conta'))
+        
+#         # Se tudo estiver correto, proceder com a exclusão
+#         usuario = Usuario.query.get(current_user.id)
+
+#         # Enviar o e-mail de notificação de exclusão de conta
+#         enviar_email_exclusao_conta(usuario)
+        
+#         # Excluir o usuário do banco de dados
+#         database.session.delete(usuario)
+#         database.session.commit()
+        
+#         # Fazer logout após excluir a conta
+#         logout_user()
+        
+#         flash('Sua conta e todo o seu conteúdo foram excluídos.', 'alert-success')
+#         return redirect(url_for('home'))  # Redirecionar para a página inicial
+#     else:
+#         # Se a requisição não for válida, mostrar uma mensagem de erro
+#         flash('Requisição inválida.', 'alert-danger')
+#         return redirect(url_for('perfil'))
+
+@app.route('/confirmar_exclusao', methods=['GET', 'POST'])
 @login_required
-def excluir_conta():
-    delete_account_form = DeleteAccountForm()
-    if delete_account_form.validate_on_submit():
-        usuario = Usuario.query.get(current_user.id)
-        # Envia o e-mail de notificação de exclusão de conta antes de excluir
+def confirmar_exclusao():
+    form = ConfirmarExclusaoContaForm()
+    if form.validate_on_submit():
+        # Verificar se a senha está correta
+        if not bcrypt.check_password_hash(current_user.senha, form.senha.data):
+            flash('Senha incorreta. Tente novamente.', 'alert-danger')
+            return redirect(url_for('confirmar_exclusao'))
+        
+        # Verificar se o checkbox foi marcado
+        if not form.confirmacao.data:
+            flash('Você deve marcar a caixa de confirmação para excluir sua conta.', 'alert-danger')
+            return redirect(url_for('confirmar_exclusao'))
+        
+        # Excluir a conta
+        usuario = current_user
         enviar_email_exclusao_conta(usuario)
         database.session.delete(usuario)
         database.session.commit()
+        
+        # Fazer logout
         logout_user()
-        flash('Sua conta e todo o seu conteúdo foram excluídos.', 'alert-success')
+        
+        flash('Sua conta foi excluída com sucesso.', 'alert-success')
         return redirect(url_for('home'))
-    else:
-        flash('Requisição inválida.', 'alert-danger')
-        return redirect(url_for('perfil'))
 
+    return render_template('confirmar_exclusao.html', form=form)
 
 @app.route('/politica_privacidade')
 @login_required
