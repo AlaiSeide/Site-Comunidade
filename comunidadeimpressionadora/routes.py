@@ -182,6 +182,7 @@ def confirmar_email(token):
             usuario.confirmado = True  # Marca o usuário como confirmado
             usuario.data_confirmacao = datetime.now(timezone.utc)  # Salva a data de confirmação
             database.session.commit()  # Salva as mudanças no banco de dados
+            enviar_email_bem_vindo(usuario)
             flash('Sua conta foi confirmada! Agora você pode fazer login.', 'alert-success')  # Mensagem de sucesso
             return redirect(url_for('login'))  # Redireciona para a página de login
         else:
