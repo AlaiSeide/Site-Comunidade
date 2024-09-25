@@ -5,6 +5,7 @@ from flask_login import LoginManager
 import os
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
+from flask_admin import Admin
 # from flask_babel import Babel, get_locale
 
 
@@ -41,7 +42,7 @@ botelkampip = '192.168.178.7'
 if os.getenv("DATABASE_URL"):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://alaiseide:Flashreverso2020..@{botelkampip}/comunidade'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://alaiseide:Flashreverso2020..@{localhost}/comunidade'
 
 
 # Configuração da URI do banco de dados SQLite
@@ -66,6 +67,8 @@ database = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
+# Crie uma instância do Flask-Admin
+admin = Admin(app, name='Administração', template_mode='bootstrap3')
 # a pagina onde o usuario sera redirecionado caso tente acessar uma pagina sem fazer login
 # passei login que é a minha pagina de cadastro
 login_manager.login_view = 'login'

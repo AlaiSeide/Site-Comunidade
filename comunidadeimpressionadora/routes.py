@@ -7,7 +7,7 @@ import secrets
 import os
 from functools import wraps
 from PIL import Image
-from .forgotpassword import gerar_token, validar_token, enviar_email
+from comunidadeimpressionadora.forgotpassword import gerar_token, validar_token, enviar_email
 from datetime import datetime, timezone
 from comunidadeimpressionadora.utils import enviar_email_bem_vindo, enviar_email_alteracao_senha, enviar_email_exclusao_conta, enviar_email_confirmacao_redefinicao_senha, enviar_email_confirmacao, confirmar_token, gerar_codigo_confirmacao
 
@@ -29,7 +29,11 @@ def home():
 def contato():
         contatoform = ContatoForm()
         if contatoform.validate_on_submit():
-            contato = Contato(nome=contatoform.nome.data, email=contatoform.email.data, mensagem=contatoform.mensagem.data)
+            contato = Contato(
+                            nome=contatoform.nome.data,
+                            email=contatoform.email.data,
+                            mensagem=contatoform.mensagem.data
+                        )
 
             database.session.add(contato)
             database.session.commit()
@@ -82,6 +86,7 @@ def usuarios():
 # A funcao e uma pagina de formulario tem que ter o metodo POST/GET
 @app.route('/login', methods=['GET', 'POST'])
 def login(): 
+    # se o usuario estiver autenticado redireciona para o home, impedir ele de acessar a pagina de login
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     # instanciando o meu formulario de login a minha classe FormLogin()
@@ -92,10 +97,11 @@ def login():
     # Verifica se o usuario fez login com sucesso
     if form_login.validate_on_submit() and 'botao_submit_login' in request.form:
         # Então, resumindo, essa linha de código está procurando no banco de dados pelo usuário que possui o email fornecido no formulário de login e armazenando esse usuário na variável usuario.
-        usuario = Usuario.query.filter_by(email=form_login.email.data).first()
+        usuario = Usuario.query.filter_by(email = form_login.email.data).first()
         #print(usuario.senha)
         # se o usuario existe e se a senha que ele preencheu é a mesma que ta no banco de dados
         if usuario and bcrypt.check_password_hash(usuario.senha, form_login.senha.data):
+            # deixa o usuario fazer login se ele ja confirmou o seu email
             if usuario.confirmado:
                 # fazendo login do usuario
                 login_user(usuario, remember=form_login.lembrar_dados.data)
@@ -134,7 +140,10 @@ def login():
         # Criar o usuario
         # adicionar na sessao
         # dar commit da sessao
-        usuario = Usuario(username=form_criarconta.username.data, email=form_criarconta.email.data, senha=senha_cript, codigo_confirmacao=codigo_confirmacao)
+        usuario = Usuario(username=form_criarconta.username.data, 
+                          email=form_criarconta.email.data, 
+                          senha=senha_cript, 
+                          codigo_confirmacao=codigo_confirmacao)
         database.session.add(usuario)
         database.session.commit()
         enviar_email_confirmacao(usuario)  # Envia o e-mail de confirmação para o usuário
@@ -151,7 +160,7 @@ def login():
         return redirect(url_for("home"))
 
     # form_login=form_login, form_criarconta=form_criarconta está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
-    return render_template('login.html', form_login=form_login, form_criarconta=form_criarconta)
+    return render_template('login.html', form_login=form_login, form_criarconta = form_criarconta)
 
 
 # Rota para confirmar o e-mail usando o token e o código de confirmação
@@ -163,13 +172,13 @@ def confirmar_email(token):
         flash('O link de confirmação é inválido ou expirou.', 'alter-danger')  # Se o token for inválido ou expirado, mostra erro
         return redirect(url_for('login'))  # Redireciona para o login
 
-    usuario = Usuario.query.filter_by(email=email).first_or_404()  # Procura o usuário pelo e-mail no banco de dados
+    usuario = Usuario.query.filter_by(email = email).first_or_404()  # Procura o usuário pelo e-mail no banco de dados
     if usuario.confirmado:  # Se o e-mail já foi confirmado, avisa o usuário
         flash('Conta já confirmada. Por favor, faça login.', 'alert-info')
         return redirect(url_for('login'))
 
     if form.validate_on_submit():  # Se o formulário for enviado
-         # Concatenar os valores dos campos do formulário para formar o código completo
+        # Concatenar os valores dos campos do formulário para formar o código completo
         codigo_digitado = ''.join([
             form.code1.data,
             form.code2.data,
@@ -231,7 +240,10 @@ def criar_post():
     formcriarpost = FormCriarPost()
 
     if formcriarpost.validate_on_submit():
-        post = Post(titulo=formcriarpost.titulo.data, corpo=formcriarpost.corpo.data, autor=current_user)
+        post = Post(titulo=formcriarpost.titulo.data, 
+                    corpo=formcriarpost.corpo.data, 
+                    autor=current_user
+                )
         database.session.add(post)
         database.session.commit()
         flash('Post Criado com Sucesso', 'alert-success')
@@ -278,7 +290,6 @@ def atualizar_cursos(formulario):
 @app.route('/perfil/editar', methods=['GET', 'POST'])
 @login_required
 def editar_perfil():
-    delete_account_form = DeleteAccountForm()
     # uma instancia da minha classe FormEdiarPerfil
     formeditarperfil = FormEdiarPerfil()
     # validar o meu formulario
@@ -315,17 +326,17 @@ def editar_perfil():
     
     foto_perfil = f'/static/fotos_perfil/{current_user.foto_perfil}'
     # foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
-    return render_template('editarperfil.html', foto_perfil=foto_perfil, formeditarperfil=formeditarperfil, delete_account_form=delete_account_form)
+    return render_template('editarperfil.html', foto_perfil=foto_perfil, formeditarperfil=formeditarperfil)
 
 
 
 
 # O decorador @app.route é usado para associar uma URL a uma função específica.
 # Neste caso, a URL é '/post/<post_id>'. '<post_id>' é uma variável na URL.
-@app.route('/post/<post_id>', methods=['GET', 'POST'])
-@login_required
 # Esta é a definição da função 'exibir_post'. Ela é chamada quando a URL acima é acessada.
 # A função recebe um argumento, 'post_id', que é o valor da variável na URL.
+@app.route('/post/<post_id>', methods=['GET', 'POST'])
+@login_required
 def exibir_post(post_id):
 
     # Aqui, 'Post.query.get(post_id)' está fazendo uma consulta ao banco de dados para obter o post com o id especificado.
