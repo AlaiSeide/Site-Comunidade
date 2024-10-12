@@ -24,6 +24,7 @@ def home():
     return render_template('home.html', posts=posts)
 
 
+
 # pagina de contato
 @app.route("/contato", methods=['GET', 'POST'])
 def contato():

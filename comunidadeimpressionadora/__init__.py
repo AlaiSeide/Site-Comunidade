@@ -5,6 +5,10 @@ from flask_login import LoginManager
 import os
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
+from flask_admin import Admin
+from flask_migrate import Migrate
+from dotenv import load_dotenv
+load_dotenv()
 # from flask_babel import Babel, get_locale
 
 
@@ -35,13 +39,13 @@ mail = Mail(app)
 # localhost de Bötelkamp
 # localhost =  '192.168.56.1'
 # ip integra
-localhost =  '192.168.220.7'
+#localhost =  '192.168.220.7'
 botelkampip = '192.168.178.7'
 
 if os.getenv("DATABASE_URL"):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://alaiseide:Flashreverso2020..@{botelkampip}/comunidade'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:Flashreverso2020..@localhost/Comunidade'
 
 
 # Configuração da URI do banco de dados SQLite
@@ -63,9 +67,12 @@ else:
 # SQLAlchemy é uma biblioteca para trabalhar com bancos de dados relacionais de forma orientada a objetos
 # Associar o objeto SQLAlchemy à instância do Flask permite usar recursos do SQLAlchemy na aplicação Flask
 database = SQLAlchemy(app)
+migrate = Migrate(app, database)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
+# Crie uma instância do Flask-Admin
+admin = Admin(app, name='Administração', template_mode='bootstrap3')
 # a pagina onde o usuario sera redirecionado caso tente acessar uma pagina sem fazer login
 # passei login que é a minha pagina de cadastro
 login_manager.login_view = 'login'
