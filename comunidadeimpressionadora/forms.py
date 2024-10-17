@@ -18,8 +18,13 @@ class FormCriarConta(FlaskForm):
     # funcao de validacao para um email unico no banco de dados
     def validate_email(self, email):
         usuario = Usuario.query.filter_by(email=email.data).first()  # Verifica no banco de dados se o e-mail já existe
-        if usuario: # Se já existir, retorna um erro
-            raise ValidationError('E-mail já cadastrado. Cadastre-se com outro e-mail ou faça login para continuar') 
+        if usuario:
+            if not usuario.confirmado:  # Verifica se a conta ainda não foi confirmada
+                # Levanta um erro sugerindo reenviar a confirmação
+                raise ValidationError('Este e-mail já foi registrado, mas a conta não foi confirmada. Reenvie o e-mail de confirmação ou use outro e-mail.')
+            else:
+                # Se a conta já foi confirmada, levanta o erro padrão
+                raise ValidationError('E-mail já cadastrado. Cadastre-se com outro e-mail ou faça login para continuar.')
 
 
 # formularios de fazer login

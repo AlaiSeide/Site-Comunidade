@@ -161,7 +161,7 @@ def login():
         return redirect(url_for("home"))
 
     # form_login=form_login, form_criarconta=form_criarconta está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
-    return render_template('login.html', form_login=form_login, form_criarconta = form_criarconta)
+    return render_template('login.html', form_login=form_login, form_criarconta=form_criarconta)
 
 
 # Rota para confirmar o e-mail usando o token e o código de confirmação

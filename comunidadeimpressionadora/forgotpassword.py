@@ -1,3 +1,4 @@
+import threading
 from flask import render_template
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
@@ -90,6 +91,13 @@ def validar_token(token_str):
 #     # Por simplicidade, vamos só imprimir o link
 #     print(f'Clique no link para redefinir sua senha: {link}')
 
+
+# Função que envia o e-mail em segundo plano (usando thread)
+def enviar_email_thread(msg):
+    with app.app_context():
+        mail.send(msg)
+
+# Função que prepara e inicia o envio de e-mail em uma thread
 def enviar_email(email, assunto, template, **kwargs):
     """
     Envia um email contendo o link para redefinir a senha.
@@ -103,4 +111,6 @@ def enviar_email(email, assunto, template, **kwargs):
                     recipients=[email])
     
     msg.html = render_template(template + '.html', **kwargs)
-    mail.send(msg)
+    # Cria uma thread para enviar o e-mail em segundo plano
+    thread = threading.Thread(target=enviar_email_thread, args=(msg,))
+    thread.start()  # Inicia a thread para enviar o e-mail

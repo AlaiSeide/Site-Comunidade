@@ -5,6 +5,8 @@ import random  # Para gerar códigos aleatórios
 import string  # Para gerar strings, como o código de confirmação
 from itsdangerous import URLSafeTimedSerializer  # Para criar tokens seguros
 from comunidadeimpressionadora import app
+import threading
+
 
 def enviar_email_bem_vindo(usuario):
     # Cria o e-mail com o assunto e o destinatário
@@ -54,6 +56,12 @@ def enviar_email_confirmacao_redefinicao_senha(usuario):
     mail.send(msg)
 
 
+
+# Função que envia o email usando uma thread
+def enviar_email_thread(msg):
+    with app.app_context():
+        mail.send(msg)
+
 # unção para gerar o código de confirmação (um código de 6 dígitos, por exemplo)
 def gerar_codigo_confirmacao():
     return ''.join(random.choices(string.digits, k=6))  # Gera um código de 6 dígitos
@@ -90,4 +98,6 @@ def enviar_email_confirmacao(usuario):
     html = render_template('confirmar_email.html', confirmar_url=confirmar_url, codigo_confirmacao=codigo_confirmacao)  # Cria o corpo do e-mail
     msg = Message('Confirme seu E-mail', sender='noreply@seusite.com', recipients=[usuario.email])  # Configura a mensagem
     msg.html = html  # Adiciona o HTML ao e-mail
-    mail.send(msg)  # Envia o e-mail
+    # Cria uma thread para enviar o e-mail em segundo plano
+    thread = threading.Thread(target=enviar_email_thread, args=(msg,))
+    thread.start()  # Inicia a thread para enviar o e-mail

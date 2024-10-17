@@ -5,7 +5,6 @@ from flask_login import LoginManager
 import os
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
-from flask_admin import Admin
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 load_dotenv()
@@ -71,10 +70,7 @@ migrate = Migrate(app, database)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
-# Crie uma instância do Flask-Admin
-admin = Admin(app, name='Administração', template_mode='bootstrap3')
-# Crie uma instância do Flask-Admin
-admin = Admin(app, name='Administração', template_mode='bootstrap3')
+
 # a pagina onde o usuario sera redirecionado caso tente acessar uma pagina sem fazer login
 # passei login que é a minha pagina de cadastro
 login_manager.login_view = 'login'
