@@ -36,7 +36,6 @@ class FormLogin(FlaskForm):
     botao_submit_login = SubmitField('Fazer Login')
 
 
-
 class FormEdiarPerfil(FlaskForm):
     username = StringField('Nome de Usuário', validators=[DataRequired()])
     email = StringField('E-mail', validators=[DataRequired(), Email()])

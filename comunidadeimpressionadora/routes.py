@@ -17,7 +17,7 @@ from comunidadeimpressionadora.utils import enviar_email_bem_vindo, enviar_email
 # print("Atributos do babel:", dir(babel))
 
 # pagina principal
-@app.route("/")
+@app.route("/")#####
 def home():
     # ordenar os post do recentes para mais antigos order_by(Post.id.desc())
     posts = Post.query.order_by(Post.id.desc())
