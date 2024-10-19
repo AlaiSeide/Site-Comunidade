@@ -104,7 +104,6 @@ class ConfirmarExclusaoContaForm(FlaskForm):
     submit = SubmitField('Excluir Conta')
 
 
-
 # Definição dos formulários
 
 class EsqueciSenhaForm(FlaskForm):

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 # Inicializa o serializador para criar tokens seguros
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-# unção para gerar o token
+# função para gerar o token
 # Vamos criar uma função que cria uma chave especial para o usuário:
 # def gerar_token(usuario):
 #     s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
@@ -109,8 +109,8 @@ def enviar_email(email, assunto, template, **kwargs):
     msg = Message(assunto, 
                     sender='noreply@comunidadeimpressionadora.com',
                     recipients=[email])
-    
     msg.html = render_template(template + '.html', **kwargs)
+
     # Cria uma thread para enviar o e-mail em segundo plano
     thread = threading.Thread(target=enviar_email_thread, args=(msg,))
     thread.start()  # Inicia a thread para enviar o e-mail
