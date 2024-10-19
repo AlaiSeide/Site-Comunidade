@@ -1,6 +1,6 @@
 from flask import render_template
 from comunidadeimpressionadora.main import main_bp
-from comunidadeimpressionadora.models import Post
+from comunidadeimpressionadora.model import Post
 
 @main_bp.route('/')
 def home():

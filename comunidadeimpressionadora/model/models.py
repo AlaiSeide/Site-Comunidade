@@ -4,15 +4,14 @@
 from comunidadeimpressionadora.extensions import database, login_manager
 from datetime import datetime, timezone
 from flask_login import UserMixin
-from comunidadeimpressionadora.models import Post
 
 # encontrar o usuario apartir de um id
 @login_manager.user_loader
 def load_usuario(id_usuario):
     return Usuario.query.get(int(id_usuario))
 
-
 class Usuario(database.Model, UserMixin):
+
     # __tablename__ = 'usuarios'  # Nome da tabela no banco
     """
         Modelo de Usuário que representa os usuários do sistema.
@@ -53,7 +52,17 @@ class Usuario(database.Model, UserMixin):
     def is_active(self):
         return self.confirmado  # Retorna se o usuário está ativo (se confirmou o e-mail)
 
+class Post(database.Model):
+    id = database.Column(database.Integer, primary_key=True)
+    titulo = database.Column(database.String(50), nullable=False)
+    corpo = database.Column(database.Text, nullable=False)
+    # Use datetime.now(timezone.utc) para criar um datetime consciente do fuso horário UTC
+    data_criacao = database.Column(database.DateTime, nullable=False, default=datetime.now(timezone.utc))
+    # 'usuario.id' é a minha tabela de Usuario pegando o id
+    id_usuario = database.Column(database.Integer,  database.ForeignKey('usuario.id'), nullable=False)
 
+    def __repr__(self):
+        return f'<Post {self.id} de Usuário {self.id_usuario}>'
 
 class Contato(database.Model):
     id = database.Column(database.Integer, primary_key=True)
@@ -72,3 +81,6 @@ class TokenRedefinicao(database.Model):
     # expiracao = database.Column(database.DateTime, default=lambda: datetime.utcnow() + timedelta(hours=1))  # Data de expiração
     data_expiracao = database.Column(database.DateTime(timezone=True), nullable=False)  # Data e hora de expiração do token
     usado = database.Column(database.Boolean, default=False, nullable=False)  # Indica se o token já foi usado
+
+
+

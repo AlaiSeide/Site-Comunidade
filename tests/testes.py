@@ -1,6 +1,6 @@
 from comunidadeimpressionadora import app
 
-from comunidadeimpressionadora.models import Usuario, Post, Contato, TokenRedefinicao
+from comunidadeimpressionadora.model import Usuario, Post, Contato, TokenRedefinicao
 
 with app.app_context():
     database.drop_all()
