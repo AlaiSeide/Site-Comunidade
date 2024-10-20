@@ -1,10 +1,10 @@
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
-from datetime import datetime
+from datetime import datetime, timezone
 from comunidadeimpressionadora.extensions import bcrypt, database
 
 from comunidadeimpressionadora.auth import auth_bp
-from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm, RedefinirSenhaForm
+from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm, RedefinirSenhaForm, ConfirmacaoEmailForm
 from comunidadeimpressionadora.model import Usuario
 
 from comunidadeimpressionadora.mailer import enviar_email_de_confirmacao, gerar_codigo_confirmacao, validar_token_confirmacao_email, enviar_email_de_boas_vindas, enviar_email_confirmacao_de_redefinicao_de_senha
@@ -51,7 +51,7 @@ def login():
                     return redirect(url_for("main.home"))
             else:
                 flash(f'Por favor, confirme o seu e-mail para poder acessar sua conta e fazer login.','alert-info')
-                return redirect(url_for("unconfirmed"))
+                return redirect(url_for("auth.unconfirmed"))
         else:
             flash(f'Falha no Login. E-mail ou Senha Incorretos.','alert-danger')
 

@@ -1,11 +1,11 @@
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, logout_user
 
 from comunidadeimpressionadora.extensions import database, bcrypt
 from comunidadeimpressionadora.user import user_bp
-from comunidadeimpressionadora.forms import FormEdiarPerfil, AlterarSenhaForm
+from comunidadeimpressionadora.forms import FormEdiarPerfil, AlterarSenhaForm, ConfirmarExclusaoContaForm
 from comunidadeimpressionadora.model import Usuario
-
+from comunidadeimpressionadora.mailer import enviar_email_alteracao_senha, enviar_email_exclusao_conta
 from .utils import salvar_imagem, atualizar_cursos
 
 @user_bp.route('/perfil')

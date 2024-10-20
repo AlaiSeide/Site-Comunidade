@@ -12,6 +12,9 @@ class Config:
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = 'seuemail@gmail.com'
     
+    # Adicione uma variável para o domínio
+    SITE_DOMAIN = os.getenv('SITE_DOMAIN') or 'localhost:5000'
+
     # Configuração do banco de dados
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'mysql+mysqlconnector://root:Flashreverso2020..@localhost/Comunidade')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
