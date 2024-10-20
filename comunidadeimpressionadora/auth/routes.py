@@ -2,14 +2,15 @@ from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user
 
 
-from comunidadeimpressionadora import bcrypt, database
+from comunidadeimpressionadora.extensions import bcrypt, database
 
 from comunidadeimpressionadora.auth import auth_bp
-from comunidadeimpressionadora.forms import FormLogin, FormCriarConta
-from comunidadeimpressionadora.models import Usuario
+from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm
+from comunidadeimpressionadora.model import Usuario
 
+from comunidadeimpressionadora.mailer import enviar_email_de_confirmacao, gerar_codigo_confirmacao, validar_token_confirmacao_email, enviar_email_de_boas_vindas, enviar_email_confirmacao_de_redefinicao_de_senha
 
-from comunidadeimpressionadora.utils import enviar_email_confirmacao, gerar_codigo_confirmacao
+from comunidadeimpressionadora.password_reset import gerar_token, enviar_email, validar_token
 
 # pagina de login e criar_conta
 # A funcao e uma pagina de formulario tem que ter o metodo POST/GET
@@ -23,6 +24,7 @@ def login():
 
     # instanciando o meu formulario de criar_conta a minha classe FormCriarConta()
     form_criarconta = FormCriarConta()
+
     # Verifica se o usuario fez login com sucesso
     if form_login.validate_on_submit() and 'botao_submit_login' in request.form:
         # Então, resumindo, essa linha de código está procurando no banco de dados pelo usuário que possui o email fornecido no formulário de login e armazenando esse usuário na variável usuario.
@@ -61,7 +63,8 @@ def login():
     # Verifica se o usuario criou conta com sucesso
     if form_criarconta.validate_on_submit() and 'botao_submit_criarconta' in request.form:
         # Gera o código de confirmação
-        codigo_confirmacao = gerar_codigo_confirmacao()  # Gera o código de 6 dígitos
+        # Gera o código de 6 dígitos
+        codigo_confirmacao = gerar_codigo_confirmacao() 
         # print(request.form)
         # criptografar a senha
         senha_cript = bcrypt.generate_password_hash(form_criarconta.senha.data)
@@ -75,7 +78,10 @@ def login():
                           codigo_confirmacao=codigo_confirmacao)
         database.session.add(usuario)
         database.session.commit()
-        enviar_email_confirmacao(usuario)  # Envia o e-mail de confirmação para o usuário
+
+        # Envia o e-mail de confirmação para o usuário
+        enviar_email_de_confirmacao(usuario)
+
         flash('Um e-mail de confirmação foi enviado. Verifique sua caixa de entrada.', 'alert-success')  # Notifica o usuário
         # fazendo login do usuario
         # login_user(usuario)
@@ -89,22 +95,22 @@ def login():
         return redirect(url_for("main.home"))
 
     # form_login=form_login, form_criarconta=form_criarconta está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
-    return render_template('login.html', form_login=form_login, form_criarconta=form_criarconta)
+    return render_template('auth/login.html', form_login=form_login, form_criarconta=form_criarconta)
 
 
 # Rota para confirmar o e-mail usando o token e o código de confirmação
-@app.route('/confirmar/<token>', methods=['GET', 'POST'])
+@auth_bp.route('/confirmar/<token>', methods=['GET', 'POST'])
 def confirmar_email(token):
     form = ConfirmacaoEmailForm()  # Instancia o formulário de confirmação
-    email = confirmar_token(token)  # Confirma o token e obtém o e-mail
+    email = validar_token_confirmacao_email(token)  # Confirma o token e obtém o e-mail
     if not email:
         flash('O link de confirmação é inválido ou expirou.', 'alter-danger')  # Se o token for inválido ou expirado, mostra erro
-        return redirect(url_for('login'))  # Redireciona para o login
+        return redirect(url_for('auth.login'))  # Redireciona para o login
 
     usuario = Usuario.query.filter_by(email = email).first_or_404()  # Procura o usuário pelo e-mail no banco de dados
     if usuario.confirmado:  # Se o e-mail já foi confirmado, avisa o usuário
         flash('Conta já confirmada. Por favor, faça login.', 'alert-info')
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
 
     if form.validate_on_submit():  # Se o formulário for enviado
         # Concatenar os valores dos campos do formulário para formar o código completo
@@ -120,26 +126,26 @@ def confirmar_email(token):
             usuario.confirmado = True  # Marca o usuário como confirmado
             usuario.data_confirmacao = datetime.now(timezone.utc)  # Salva a data de confirmação
             database.session.commit()  # Salva as mudanças no banco de dados
-            enviar_email_bem_vindo(usuario)
+            enviar_email_de_boas_vindas(usuario)
             flash('Sua conta foi confirmada! Agora você pode fazer login.', 'alert-success')  # Mensagem de sucesso
-            return redirect(url_for('login'))  # Redireciona para a página de login
+            return redirect(url_for('auth.login'))  # Redireciona para a página de login
         else:
             flash('Código de confirmação inválido. Tente novamente.', 'alert-danger')  # Se o código estiver errado, mostra erro
 
-    return render_template('confirmar_codigo.html', form=form)  # Renderiza a página para inserir o código
+    return render_template('auth/confirmar_codigo.html', form=form)  # Renderiza a página para inserir o código
 
 # Rota para informar ao usuário que ele ainda não confirmou o e-mail
-@app.route('/unconfirmed')
+@auth_bp.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_authenticated and not current_user.confirmado:
         flash('Por favor, confirme seu e-mail.', 'alert-info')  # Avisa o usuário para confirmar o e-mail
-    return render_template('unconfirmed.html')  # Renderiza a página de confirmação pendente
+    return render_template('auth/unconfirmed.html')  # Renderiza a página de confirmação pendente
 
 
-@app.route('/esqueci_senha', methods=['GET', 'POST'])
+@auth_bp.route('/esqueci_senha', methods=['GET', 'POST'])
 def esqueci_senha():
     if current_user.is_authenticated:
-        return redirect(url_for('perfil'))
+        return redirect(url_for('user.perfil'))
         
     form = EsqueciSenhaForm()  # Cria uma instância do formulário
     if form.validate_on_submit():  # Verifica se o formulário foi enviado e é válido
@@ -161,18 +167,18 @@ def esqueci_senha():
                 ano_atual=datetime.now().year
             )
             flash('Um email foi enviado com instruções para redefinir sua senha.', 'alert-success')
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))
         else:
             flash('Email não encontrado.', 'alert-danger')
-            return redirect(url_for('esqueci_senha'))
-    return render_template('esqueci_senha.html', form=form)
+            return redirect(url_for('auth.esqueci_senha'))
+    return render_template('auth/esqueci_senha.html', form=form)
 
 
-@app.route('/redefinir_senha/<token>', methods=['GET', 'POST'])
+@auth_bp.route('/redefinir_senha/<token>', methods=['GET', 'POST'])
 def redefinir_senha(token):
     if current_user.is_authenticated:
         # Usuário já está logado, redirecionar para a página inicial ou perfil
-        return redirect(url_for('home'))  # Substitua 'inicio' pela rota adequada
+        return redirect(url_for('main.home'))  # Substitua 'inicio' pela rota adequada
     """
     Rota para redefinir a senha usando o token recebido.
     """
@@ -181,7 +187,7 @@ def redefinir_senha(token):
     if not token_obj:
             # Se o token for inválido ou expirou, exibe uma mensagem de erro
             flash('O link é inválido ou expirou.', 'alert-danger')
-            return redirect(url_for('esqueci_senha'))
+            return redirect(url_for('auth.esqueci_senha'))
     
     # Busca o usuário associado ao token pelo id desse usuario
     usuario = Usuario.query.get(token_obj.usuario_id)
@@ -189,7 +195,7 @@ def redefinir_senha(token):
     if not usuario:
         # Se o usuário não for encontrado, exibe uma mensagem de erro
         flash('Usuário não encontrado.', 'alert-danger')
-        return redirect(url_for('esqueci_senha'))
+        return redirect(url_for('auth.esqueci_senha'))
     
     form = RedefinirSenhaForm()  # Cria uma instância do formulário de redefinição de senha
 
@@ -209,14 +215,14 @@ def redefinir_senha(token):
             database.session.commit()
             
             # Envia o e-mail de confirmação de redefinição de senha
-            enviar_email_confirmacao_redefinicao_senha(usuario)
+            enviar_email_confirmacao_de_redefinicao_de_senha(usuario)
 
             # Exibe uma mensagem de sucesso
             flash('Sua senha foi redefinida com sucesso!', 'alert-success')
-            return redirect(url_for('home'))
+            return redirect(url_for('main.home'))
     
     # Renderiza o formulário de redefinir_senha.html
-    return render_template('redefinir_senha.html', form=form)
+    return render_template('auth/redefinir_senha.html', form=form)
 
 
 # pagina de sair
