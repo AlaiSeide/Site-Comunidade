@@ -1,17 +1,19 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_required
-from comunidadeimpressionadora import database, bcrypt
+
+from comunidadeimpressionadora.extensions import database, bcrypt
 from comunidadeimpressionadora.user import user_bp
 from comunidadeimpressionadora.forms import FormEdiarPerfil, AlterarSenhaForm
-from comunidadeimpressionadora.models import Usuario
+from comunidadeimpressionadora.model import Usuario
 
+from .utils import salvar_imagem, atualizar_cursos
 
 @user_bp.route('/perfil')
 @login_required
 def perfil():
     foto_perfil = f'/static/fotos_perfil/{current_user.foto_perfil}'
     # foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
-    return render_template('perfil.html', foto_perfil=foto_perfil)
+    return render_template('user/perfil.html', foto_perfil=foto_perfil)
 
 
 @user_bp.route('/perfil/editar', methods=['GET', 'POST'])
@@ -40,7 +42,7 @@ def editar_perfil():
         database.session.commit()
         flash(f'Perfil Atualizado com Sucesso', 'alert-success')
         # redirecionar para a pagina do perfil dele
-        return redirect(url_for('perfil'))
+        return redirect(url_for('user.perfil'))
     
     # preencher o formulario automaticamente
     # Verifica se a requisição HTTP é do tipo GET, ou seja, se é a primeira vez que a página está sendo carregada.
@@ -53,67 +55,7 @@ def editar_perfil():
     
     foto_perfil = f'/static/fotos_perfil/{current_user.foto_perfil}'
     # foto_perfil = url_for(f'static', filename='fotos_perfil/{current_user.foto_perfil}')
-    return render_template('editarperfil.html', foto_perfil=foto_perfil, formeditarperfil=formeditarperfil)
-
-# pagina de usuarios
-@user_bp.route("/usuarios")
-@login_required
-def usuarios():
-    # meus_usuarios=lista_usuarios está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
-
-    # pegando todos os usuarios do meu banco de dados 
-    lista_usuarios = Usuario.query.all()
-    ## print(lista_usuarios)
-    return render_template('usuarios.html', meus_usuarios=lista_usuarios)
-
-
-
-# pagina de contato
-@app.route("/contato", methods=['GET', 'POST'])
-def contato():
-        contatoform = ContatoForm()
-        if contatoform.validate_on_submit():
-            contato = Contato(
-                            nome=contatoform.nome.data,
-                            email=contatoform.email.data,
-                            mensagem=contatoform.mensagem.data
-                        )
-
-            database.session.add(contato)
-            database.session.commit()
-            print(request.form)
-            print(request.method)
-            print(request.full_path)
-            print(request.args)
-            flash('Sua mensagem foi enviada com sucesso!', 'alert-success')
-        elif request.method == 'GET' and current_user.is_authenticated:
-           contatoform.nome.data = current_user.username
-           contatoform.email.data = current_user.email
-
-        # Configuração do email
-        # meu_email = "alaiseide2006@gmail.com"  # Substitua pelo seu email
-        # minha_senha = "Flashrevers20102010.."  # Substitua pela sua senha
-
-        # # Criar a mensagem
-        # msg = MIMEMultipart()
-        # msg['From'] = meu_email
-        # msg['To'] = meu_email  # Você pode substituir por qualquer outro email
-        # msg['Subject'] = "Nova mensagem de contato"
-        # corpo_email = f"Nome: {contatoform.nome.data}\nEmail: {contatoform.email.data}\nMensagem:\n{contatoform.mensagem.data}"
-        # msg.attach(MIMEText(corpo_email, 'plain'))
-
-        # # Enviar o email
-        # server = smtplib.SMTP('smtp.gmail.com', 587)  # Use o servidor SMTP do seu provedor de email
-        # server.starttls()
-        # server.login(meu_email, minha_senha)
-        # text = msg.as_string()
-        # server.sendmail(meu_email, meu_email, text)
-        # server.quit()
-        # Aqui você pode adicionar o código para lidar com os dados do formulário de contato
-        # Por exemplo, você pode enviar um e-mail com a mensagem ou armazená-la em um banco de dados
-
-        return render_template('contato.html', contatoform=contatoform)
-
+    return render_template('user/editarperfil.html', foto_perfil=foto_perfil, formeditarperfil=formeditarperfil)
 
 
 @user_bp.route('/alterar_senha', methods=['GET', 'POST'])
@@ -131,8 +73,8 @@ def alterar_senha():
         # Envia o e-mail de notificação de alteração de senha
         enviar_email_alteracao_senha(current_user)
         flash('Sua senha foi atualizada com sucesso!', 'alert-success')
-        return redirect(url_for('perfil'))
-    return render_template('alterar_senha.html', form=form)
+        return redirect(url_for('user.perfil'))
+    return render_template('auth/alterar_senha.html', form=form)
 
 
 @user_bp.route('/confirmar_exclusao', methods=['GET', 'POST'])
@@ -143,12 +85,12 @@ def confirmar_exclusao():
         # Verificar se a senha está correta
         if not bcrypt.check_password_hash(current_user.senha, form.senha.data):
             flash('Senha incorreta. Tente novamente.', 'alert-danger')
-            return redirect(url_for('confirmar_exclusao'))
+            return redirect(url_for('user.confirmar_exclusao'))
         
         # Verificar se o checkbox foi marcado
         if not form.confirmacao.data:
             flash('Você deve marcar a caixa de confirmação para excluir sua conta.', 'alert-danger')
-            return redirect(url_for('confirmar_exclusao'))
+            return redirect(url_for('user.confirmar_exclusao'))
         
         # Excluir a conta
         usuario = current_user
@@ -160,6 +102,6 @@ def confirmar_exclusao():
         logout_user()
         
         flash('Sua conta foi excluída com sucesso.', 'alert-success')
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
 
-    return render_template('confirmar_exclusao.html', form=form)
+    return render_template('user/confirmar_exclusao.html', form=form)

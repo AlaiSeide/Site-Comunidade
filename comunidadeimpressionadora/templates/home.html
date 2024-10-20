@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout/base.html' %}
 
 
 {% block body %}
@@ -43,7 +43,7 @@
             <div class="col col-9">
                 <!-- A tag <a> é usada para criar um link. O atributo 'href' define o destino do link. -->
                   <!-- post.id é a minha tabela de post pegando o id do post -->
-                <a style="text-decoration: none;" href="{{ url_for('exibir_post', post_id=post.id ) }}">
+                <a style="text-decoration: none;" href="{{ url_for('post.exibir_post', post_id=post.id ) }}">
                   <h3>{{ post.titulo }}</h3>
                 </a>
 

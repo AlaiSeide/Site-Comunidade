@@ -1,4 +1,4 @@
-{% extends 'perfil.html' %}
+{% extends 'user/perfil.html' %}
 
 
 {% block head %}
@@ -75,7 +75,7 @@
                         {% endif %}
                     </div>
 
-                    <a href="{{ url_for('alterar_senha') }}" class="change-password-link d-flex align-items-center">
+                    <a href="{{ url_for('user.alterar_senha') }}" class="change-password-link d-flex align-items-center">
                         <i class="bi bi-lock me-2"></i>
                         alterar_senha
                     </a>

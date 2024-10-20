@@ -14,6 +14,6 @@ csrf = CSRFProtect()
 migrate = Migrate()
 
 # Configurações do login_manager
-login_manager.login_view = 'login'
+login_manager.login_view = 'auth.login'
 login_manager.login_message = 'Faça login para acessar esta página, por favor.'
 login_manager.login_message_category = 'alert-info'

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout/base.html' %}
 
 {% block head %}
     <style>
@@ -76,7 +76,7 @@
                             {{ form_login.mostrar_senha(class="form-check-input", **{'hx-boost': 'false'}) }}
                         </div>
 
-                        <a class="d-flex align-items-center text-decoration-none text-warning" href="{{ url_for('esqueci_senha') }}">
+                        <a class="d-flex align-items-center text-decoration-none text-warning" href="{{ url_for('auth.esqueci_senha') }}">
                             <i class="bi bi-lock me-2"></i>
                             Recuperar Senha
                         </a>

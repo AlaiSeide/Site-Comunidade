@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
-from comunidadeimpressionadora.models import Usuario, Contato
+from comunidadeimpressionadora.model import Usuario, Contato
 from flask_login import current_user
 from comunidadeimpressionadora import bcrypt
 

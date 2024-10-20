@@ -4,7 +4,7 @@ from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from comunidadeimpressionadora import database, app, mail
 
-from .models import TokenRedefinicao
+from comunidadeimpressionadora.model import TokenRedefinicao
 from datetime import datetime, timedelta, timezone
 
 # Inicializa o serializador para criar tokens seguros

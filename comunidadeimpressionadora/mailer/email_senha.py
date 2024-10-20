@@ -11,5 +11,5 @@ def enviar_email_alteracao_senha(usuario):
 
 def enviar_email_confirmacao_de_redefinicao_de_senha(usuario):
     msg = Message('Sua senha foi redefinida com sucesso!', recipients=[usuario.email])
-    msg.html = render_template('email_confirmacao_redefinicao_senha.html', usuario=usuario)
+    msg.html = render_template('email/email_confirmacao_redefinicao_senha.html', usuario=usuario)
     mail.send(msg)

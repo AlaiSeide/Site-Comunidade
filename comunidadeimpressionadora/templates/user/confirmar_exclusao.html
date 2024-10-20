@@ -1,5 +1,5 @@
 <!-- templates/confirmar_exclusao.html -->
-{% extends 'base.html' %}
+{% extends '../layout/base.html' %}
 
 
 {% block title %}
@@ -11,7 +11,7 @@
     <div class="container mt-5">
         <h1>Confirmação de Exclusão de Conta</h1>
         <p>Para sua segurança, confirme sua senha e marque a opção abaixo para excluir sua conta.</p>
-        <form method="POST" action="{{ url_for('confirmar_exclusao') }}">
+        <form method="POST" action="{{ url_for('user.confirmar_exclusao') }}">
             {{ form.hidden_tag() }}
             
             <!-- Campo para inserir a senha -->
@@ -28,7 +28,7 @@
                 </label>
             </div>
 
-            <a href="{{ url_for('perfil') }}" class="btn btn-secondary">Cancelar</a>
+            <a href="{{ url_for('user.perfil') }}" class="btn btn-secondary">Cancelar</a>
             {{ form.submit(class="btn btn-danger") }}
         </form>
     </div>

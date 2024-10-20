@@ -3,20 +3,19 @@ from flask_login import login_user, logout_user, current_user
 from comunidadeimpressionadora import bcrypt, database
 from comunidadeimpressionadora.admin import admin_bp
 from comunidadeimpressionadora.forms import FormLogin, FormCriarConta
-from comunidadeimpressionadora.models import Usuario
-from comunidadeimpressionadora.utils import enviar_email_confirmacao, gerar_codigo_confirmacao
+from comunidadeimpressionadora.model import Usuario
 
-@auth_bp.route('/login', methods=['GET', 'POST'])
+@admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
     # Lógica de login aqui
     pass
 
-@auth_bp.route('/logout')
+@admin_bp.route('/logout')
 def logout():
     # Lógica de logout aqui
     pass
 
-@auth_bp.route('/register', methods=['GET', 'POST'])
+@admin_bp.route('/register', methods=['GET', 'POST'])
 def register():
     # Lógica de registro de usuário aqui
     pass

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout/base.html' %}
 {% block body %}
 
     
@@ -19,7 +19,7 @@
                 {{ form.submit(class="btn btn-outline-warning mt-2") }} <!-- Botão de envio -->
 
                  <!-- Link para voltar à página principal -->
-                <a href="{{ url_for('home') }}"  class="d-flex align-items-center text-decoration-none mt-2 text-warning">
+                <a href="{{ url_for('main.home') }}"  class="d-flex align-items-center text-decoration-none mt-2 text-warning">
                     <i class="bi bi-arrow-left-circle me-2"></i>
                     Voltar para a página principal
                 </a>

@@ -35,7 +35,7 @@ Ele vai até o #main-container (que é uma parte da sua página) e troca só ess
 
     <!-- Se nao for uma requisicao HX ele vai mostrar a bara de navegacao sem recaregar a pagina e sem duplicar. -->
     {% if not request.headers.get('HX-Request') %}
-        {% include 'navbar.html' %}
+        {% include 'layout/navbar.html' %}
     {% endif %}
 
 

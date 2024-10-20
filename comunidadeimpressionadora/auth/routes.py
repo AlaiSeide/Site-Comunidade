@@ -1,11 +1,10 @@
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, current_user
-
-
+from flask_login import login_user, logout_user, current_user, login_required
+from datetime import datetime
 from comunidadeimpressionadora.extensions import bcrypt, database
 
 from comunidadeimpressionadora.auth import auth_bp
-from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm
+from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm, RedefinirSenhaForm
 from comunidadeimpressionadora.model import Usuario
 
 from comunidadeimpressionadora.mailer import enviar_email_de_confirmacao, gerar_codigo_confirmacao, validar_token_confirmacao_email, enviar_email_de_boas_vindas, enviar_email_confirmacao_de_redefinicao_de_senha
@@ -156,12 +155,12 @@ def esqueci_senha():
             # Gera um token para o usuário
             token = gerar_token(usuario)
             # Gera o link completo para redefinir a senha
-            link = url_for('redefinir_senha', token=token, _external=True)
+            link = url_for('auth.redefinir_senha', token=token, _external=True)
             # Enviar o email
             enviar_email(
                 email=usuario.email,
                 assunto='Redefinição de Senha - Comunidade Impressionadora',
-                template='email_redefinir_senha',
+                template='email/email_redefinir_senha',
                 usuario=usuario,
                 link=link,
                 ano_atual=datetime.now().year

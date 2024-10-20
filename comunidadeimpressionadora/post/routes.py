@@ -1,12 +1,13 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user, login_required
-from comunidadeimpressionadora import database
+
+from comunidadeimpressionadora.extensions import database
 from comunidadeimpressionadora.post import post_bp
 from comunidadeimpressionadora.forms import FormCriarPost
-from comunidadeimpressionadora.models import Post
+from comunidadeimpressionadora.model import Post
 
 
-@post_bp.route('/post/criar', methods=['GET', 'POST'])
+@post_bp.route('/criar', methods=['GET', 'POST'])
 @login_required
 def criar_post():
     formcriarpost = FormCriarPost()
@@ -19,16 +20,15 @@ def criar_post():
         database.session.add(post)
         database.session.commit()
         flash('Post Criado com Sucesso', 'alert-success')
-        return redirect(url_for('home'))
-    return render_template('criarpost.html', formcriarpost=formcriarpost)
-
+        return redirect(url_for('main.home'))
+    return render_template('posts/criarpost.html', formcriarpost=formcriarpost)
 
 
 # O decorador @app.route é usado para associar uma URL a uma função específica.
 # Neste caso, a URL é '/post/<post_id>'. '<post_id>' é uma variável na URL.
 # Esta é a definição da função 'exibir_post'. Ela é chamada quando a URL acima é acessada.
 # A função recebe um argumento, 'post_id', que é o valor da variável na URL.
-@post_bp.route('/post/<post_id>', methods=['GET', 'POST'])
+@post_bp.route('/<post_id>', methods=['GET', 'POST'])
 @login_required
 def exibir_post(post_id):
 
@@ -56,18 +56,18 @@ def exibir_post(post_id):
             # posso dar so database.session.commit() porque ele ja existe no meu banco de dados
             database.session.commit()
             flash('Post Atualizado com Sucesso', 'alert-success')
-            return redirect(url_for('home'))
+            return redirect(url_for('main.home'))
     else:
         formeditarpost = None
 
     # Aqui, estamos renderizando o template 'post.html' e passando o post e o formulário para o template.
     # Isso permitirá que você use os dados do post e do formulário no seu template.
-    return render_template('post.html', post=post, formeditarpost=formeditarpost)
+    return render_template('posts/post.html', post=post, formeditarpost=formeditarpost)
 
 
 
 # Esta linha define a rota para excluir um post. Ela aceita tanto métodos GET quanto POST.
-@post_bp.route('/post/<int:post_id>/excluir', methods=['GET', 'POST'])
+@post_bp.route('/<int:post_id>/excluir', methods=['GET', 'POST'])
 # O decorador @login_required garante que o usuário deve estar logado para acessar esta rota.
 @login_required
 # Esta é a função que será chamada quando a rota acima for acessada.
@@ -88,7 +88,7 @@ def excluir_post(post_id):
         flash('Post Excluido com Sucesso', 'alert-danger')
 
         # Redirecionamos o usuário para a página inicial.
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
 
     # Se o usuário atual não for o autor do post, retornamos um erro 403 (Proibido).
     else:

@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid container">
-        <a hx-boost="false" class="navbar-brand" href="{{ url_for('home') }}">Comunidade Impressionadora</a>
+        <a hx-boost="false" class="navbar-brand" href="{{ url_for('main.home') }}">Comunidade Impressionadora</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -8,17 +8,17 @@
             <!--Primeiros links de bara de navegacao-->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a hx-boost="false" class="nav-link active" aria-current="page" href="{{ url_for('home') }}"><i class="bi bi-house-fill"></i> Inicio</a>
+                    <a hx-boost="false" class="nav-link active" aria-current="page" href="{{ url_for('main.home') }}"><i class="bi bi-house-fill"></i> Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('usuarios') }}"><i class="bi bi-people-fill"></i> Usuarios</a>
+                    <a class="nav-link" href="{{ url_for('main.usuarios') }}"><i class="bi bi-people-fill"></i> Usuarios</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('contato') }}"><i class="bi bi-telephone-fill"></i> Contato</a>
+                    <a class="nav-link" href="{{ url_for('main.contato') }}"><i class="bi bi-telephone-fill"></i> Contato</a>
                 </li>
                 <!-- Settings -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('configuracoes') }}">
+                    <a class="nav-link" href="{{ url_for('main.configuracoes') }}">
                         <i class="bi bi-gear me-1"></i>
                         Configurações
                     </a>
@@ -32,23 +32,23 @@
                 <!--Isso ai so vai aparecer se o usuario estiver autenticado-->
                 {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('criar_post') }}"><i class="bi bi-pencil-square"></i> Criar Post</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('post.criar_post') }}"><i class="bi bi-pencil-square"></i> Criar Post</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('perfil') }}"><i class="bi bi-person-circle"></i> Meu Perfil</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('user.perfil') }}"><i class="bi bi-person-circle"></i> Meu Perfil</a>
                     </li>
 
                     <li class="nav-item">
-                        <a hx-boost="false" class="nav-link active" aria-current="page" href="{{ url_for('sair') }}"><i class="bi bi-box-arrow-left"></i> Sair</a>
+                        <a hx-boost="false" class="nav-link active" aria-current="page" href="{{ url_for('auth.sair') }}"><i class="bi bi-box-arrow-left"></i> Sair</a>
                     </li>
                 <!--Isso ai so vai aparecer se o usuario nao estiver autenticado-->
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('login') }}"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right"></i> Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('login') }}"><i class="bi bi-person-plus-fill"></i> Criar Conta</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('auth.login') }}"><i class="bi bi-person-plus-fill"></i> Criar Conta</a>
                     </li>
                 {% endif %}
             </ul>

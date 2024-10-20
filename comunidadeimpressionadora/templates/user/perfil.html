@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout/base.html' %}
 
 
 {% block body %}
@@ -53,7 +53,7 @@
 
                                 <!--Botoes -->
                                 <div class="button mt-2 d-flex flex-row align-items-center">
-                                    <a class="w-100" href="{{ url_for('editar_perfil') }}">
+                                    <a class="w-100" href="{{ url_for('user.editar_perfil') }}">
                                         <button class="btn btn-sm btn-outline-warning w-100">
                                             Editar Perfil
                                         </button>
@@ -66,7 +66,7 @@
                                 </button>
 
                                 <!-- Incluir o modal de exclusão de conta -->
-                                {% include 'modal_excluir_conta.html' %}
+                                {% include 'user/modal_excluir_conta.html' %}
                             </div>
                         </div>
                        

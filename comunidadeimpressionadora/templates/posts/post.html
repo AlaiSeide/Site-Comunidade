@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout/base.html' %}
 
 
 
@@ -145,9 +145,10 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <!--O botao esta dentro de um form para ele poder exluir o post,  {{ url_for('excluir_post', post_id=post.id) }} é a minha funcao exluir post-->
+                    <!--O botao esta dentro de um form para ele poder exluir o post,  {{ url_for('post.excluir_post', post_id=post.id) }} é a minha funcao exluir post-->
                     <!-- post.id é a minha tabela de post pegando o id do post -->
-                    <form action="{{ url_for('excluir_post', post_id=post.id) }}" method="post">
+                    <form action="{{ url_for('post.excluir_post', post_id=post.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <!--Mudar o type para submit-->
                         <button type="submit" class="btn btn-danger">Excluir Post</button>
                     </form>                    
