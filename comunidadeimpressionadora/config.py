@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
+
 
 load_dotenv()
 
@@ -18,3 +20,5 @@ class Config:
     # Configuração do banco de dados
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'mysql+mysqlconnector://root:Flashreverso2020..@localhost/Comunidade')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=15)  # Tempo de sessão de 15 minutos

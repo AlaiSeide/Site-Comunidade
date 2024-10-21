@@ -5,7 +5,8 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
 from comunidadeimpressionadora.model import Usuario, Contato
 from flask_login import current_user
-from comunidadeimpressionadora import bcrypt
+from comunidadeimpressionadora.extensions import bcrypt
+from .validators import validar_senha, validar_email_unico, validar_email_temporario, validar_email_dns
 
 # Formularios de criar conta
 class FormCriarConta(FlaskForm):
@@ -15,17 +16,20 @@ class FormCriarConta(FlaskForm):
     confirmacao_senha = PasswordField('Confirmação da Senha', validators=[DataRequired(), EqualTo('senha')])
     botao_submit_criarconta = SubmitField('Criar Conta')
 
+
+    def validate_senha(self, senha):
+        validar_senha(senha.data, username=self.username.data, email=self.email.data)
+
     # funcao de validacao para um email unico no banco de dados
     def validate_email(self, email):
-        usuario = Usuario.query.filter_by(email=email.data).first()  # Verifica no banco de dados se o e-mail já existe
-        if usuario:
-            if not usuario.confirmado:  # Verifica se a conta ainda não foi confirmada
-                # Levanta um erro sugerindo reenviar a confirmação
-                raise ValidationError('Este e-mail já foi registrado, mas a conta não foi confirmada. Reenvie o e-mail de confirmação ou use outro e-mail.')
-            else:
-                # Se a conta já foi confirmada, levanta o erro padrão
-                raise ValidationError('E-mail já cadastrado. Cadastre-se com outro e-mail ou faça login para continuar.')
-
+       # Validação de e-mail único
+        validar_email_unico(email)
+        
+        # Validação para impedir domínios temporários
+        validar_email_temporario(email)
+        
+        # Validação DNS para garantir que o domínio tem registros MX
+        validar_email_dns(email)
 
 # formularios de fazer login
 class FormLogin(FlaskForm):

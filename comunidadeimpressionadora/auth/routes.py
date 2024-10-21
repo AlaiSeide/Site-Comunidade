@@ -1,6 +1,6 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, current_user, login_required
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from comunidadeimpressionadora.extensions import bcrypt, database
 
 from comunidadeimpressionadora.auth import auth_bp
@@ -10,6 +10,9 @@ from comunidadeimpressionadora.model import Usuario
 from comunidadeimpressionadora.mailer import enviar_email_de_confirmacao, gerar_codigo_confirmacao, validar_token_confirmacao_email, enviar_email_de_boas_vindas, enviar_email_confirmacao_de_redefinicao_de_senha
 
 from comunidadeimpressionadora.password_reset import gerar_token, enviar_email, validar_token
+
+# Definindo um intervalo de 10 minutos entre tentativas de reenvio
+INTERVALO_REENVIO = timedelta(minutes=10)
 
 # pagina de login e criar_conta
 # A funcao e uma pagina de formulario tem que ter o metodo POST/GET
@@ -35,6 +38,7 @@ def login():
             if usuario.confirmado:
                 # fazendo login do usuario
                 login_user(usuario, remember=form_login.lembrar_dados.data)
+                session.permanent = True  # Ativa o timeout de sessão
                 # exibir msg de login feito com sucesso aseguido do e-amil dessa pessoal
                 flash(f'Login feito com sucesso no e-mail: {form_login.email.data}', 'alert-success')
                 # redirecionar para outra pagina
@@ -140,6 +144,26 @@ def unconfirmed():
         flash('Por favor, confirme seu e-mail.', 'alert-info')  # Avisa o usuário para confirmar o e-mail
     return render_template('auth/unconfirmed.html')  # Renderiza a página de confirmação pendente
 
+@auth_bp.route('/reenviar-confirmacao')
+def reenviar_confirmacao():
+    usuario = Usuario.query.filter_by(email=current_user.email).first()
+
+    if usuario.confirmado:
+        flash('Sua conta já está confirmada.', 'alert-info')
+        return redirect(url_for('auth.login'))
+
+    # Verifica se o último envio foi há mais de 10 minutos
+    if usuario.ultimo_envio_confirmacao and datetime.utcnow() < usuario.ultimo_envio_confirmacao + INTERVALO_REENVIO:
+        flash('Você já reenviou o e-mail de confirmação recentemente. Tente novamente mais tarde.', 'alert-warning')
+        return redirect(url_for('auth.login'))
+
+    # Envia o e-mail de confirmação e atualiza o timestamp do último envio
+    enviar_email_de_confirmacao(usuario)
+    usuario.ultimo_envio_confirmacao = datetime.utcnow()
+    db.session.commit()
+
+    flash('Um novo e-mail de confirmação foi enviado.', 'alert-success')
+    return redirect(url_for('auth.login'))
 
 @auth_bp.route('/esqueci_senha', methods=['GET', 'POST'])
 def esqueci_senha():

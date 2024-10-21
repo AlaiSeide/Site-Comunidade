@@ -22,6 +22,7 @@ class Usuario(database.Model, UserMixin):
     senha = database.Column(database.String(80), nullable=False)
 
     confirmado = database.Column(database.Boolean, default=False)
+    ultimo_envio_confirmacao = database.Column(database.DateTime, nullable=True)
     data_confirmacao = database.Column(database.DateTime, nullable=True)
     codigo_confirmacao = database.Column(database.String(6), nullable=False)  # Código de confirmação
 
@@ -50,7 +51,7 @@ class Usuario(database.Model, UserMixin):
         return f'<Usuário {self.username}>'
     
     def is_active(self):
-        return self.confirmado  # Retorna se o usuário está ativo (se confirmou o e-mail)
+        return self.confirmado  # Retorna True se o usuário está ativo (se confirmou o e-mail)
 
 class Post(database.Model):
     id = database.Column(database.Integer, primary_key=True)
