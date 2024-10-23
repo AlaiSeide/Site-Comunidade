@@ -16,13 +16,6 @@
 
 {% block body %}
 
-    {% if not current_user.confirmado %}
-        <div class="alert alert-warning">
-            Sua conta ainda não foi confirmada. Não recebeu o e-mail de confirmação?
-            <a href="{{ url_for('auth.reenviar_confirmacao') }}">Clique aqui para reenviar</a>.
-        </div>
-    {% endif %}
-
     <div class="container">
         <h1 class="text-center display-6 fw-bold my-4 titulo-personalizado">Faca Login ou Crie sua Conta para Continuar</h1>
         <hr>

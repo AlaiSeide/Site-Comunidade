@@ -10,13 +10,15 @@ from comunidadeimpressionadora.model import Usuario
 from comunidadeimpressionadora.mailer import enviar_email_de_confirmacao, gerar_codigo_confirmacao, validar_token_confirmacao_email, enviar_email_de_boas_vindas, enviar_email_confirmacao_de_redefinicao_de_senha
 
 from comunidadeimpressionadora.password_reset import gerar_token, enviar_email, validar_token
-
+from comunidadeimpressionadora.extensions import limiter
 # Definindo um intervalo de 10 minutos entre tentativas de reenvio
 INTERVALO_REENVIO = timedelta(minutes=10)
+from flask_wtf.csrf import generate_csrf
 
 # pagina de login e criar_conta
 # A funcao e uma pagina de formulario tem que ter o metodo POST/GET
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")  # Limita 5 requisições por minuto na rota de login
 def login(): 
     # se o usuario estiver autenticado redireciona para o home, impedir ele de acessar a pagina de login
     if current_user.is_authenticated:
@@ -54,7 +56,7 @@ def login():
                     # Se o parâmetro 'next' não estiver presente, redireciona o usuário para a página inicial ('home') da aplicação.
                     return redirect(url_for("main.home"))
             else:
-                flash(f'Por favor, confirme o seu e-mail para poder acessar sua conta e fazer login.','alert-info')
+                #flash(f'Por favor, confirme o seu e-mail para poder acessar sua conta e fazer login.','alert-info')
                 return redirect(url_for("auth.unconfirmed"))
         else:
             flash(f'Falha no Login. E-mail ou Senha Incorretos.','alert-danger')
@@ -65,6 +67,7 @@ def login():
    
     # Verifica se o usuario criou conta com sucesso
     if form_criarconta.validate_on_submit() and 'botao_submit_criarconta' in request.form:
+        
         # Gera o código de confirmação
         # Gera o código de 6 dígitos
         codigo_confirmacao = gerar_codigo_confirmacao() 
@@ -95,7 +98,7 @@ def login():
         #flash(f'Conta Criada para o e-mail: {form_criarconta.email.data}', 'alert-success')
         # redirecionar para outra pagina
         # o return deve estar sempre atras do redirect(url_for('home'))
-        return redirect(url_for("main.home"))
+        return redirect(url_for("auth.unconfirmed"))
 
     # form_login=form_login, form_criarconta=form_criarconta está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
     return render_template('auth/login.html', form_login=form_login, form_criarconta=form_criarconta)
@@ -141,29 +144,53 @@ def confirmar_email(token):
 @auth_bp.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_authenticated and not current_user.confirmado:
-        flash('Por favor, confirme seu e-mail.', 'alert-info')  # Avisa o usuário para confirmar o e-mail
-    return render_template('auth/unconfirmed.html')  # Renderiza a página de confirmação pendente
+        flash('Por favor, confirme seu e-mail.', 'alert-info')
+    
+    # Gera o token CSRF manualmente e o passa para o template
+    csrf_token = generate_csrf()
+    return render_template('auth/unconfirmed.html', csrf_token=csrf_token)
 
-@auth_bp.route('/reenviar-confirmacao')
+@auth_bp.route('/reenviar-confirmacao', methods=['POST', 'GET'])
 def reenviar_confirmacao():
-    usuario = Usuario.query.filter_by(email=current_user.email).first()
+    if request.method == 'POST':
+        email = request.form.get('email')
 
-    if usuario.confirmado:
-        flash('Sua conta já está confirmada.', 'alert-info')
+        # Verifica se o e-mail foi preenchido
+        if not email:
+            flash('Por favor, insira o seu e-mail.', 'alert-danger')
+            return redirect(url_for('auth.reenviar_confirmacao'))
+
+        # Busca o usuário pelo e-mail
+        usuario = Usuario.query.filter_by(email=email).first()
+
+        # Verifica se o usuário existe
+        if not usuario:
+            flash('E-mail não encontrado.', 'alert-danger')
+            return redirect(url_for('auth.reenviar_confirmacao'))
+
+        # Verifica se o usuário já confirmou o e-mail
+        if usuario.confirmado:
+            flash('Sua conta já está confirmada. Você pode fazer login.', 'alert-info')
+            return redirect(url_for('auth.login'))
+
+        # Verifica se o último envio foi há menos de 10 minutos
+        if usuario.ultimo_envio_confirmacao and datetime.utcnow() < usuario.ultimo_envio_confirmacao + INTERVALO_REENVIO:
+            tempo_restante = usuario.ultimo_envio_confirmacao + INTERVALO_REENVIO - datetime.utcnow()
+            minutos_restantes = int(tempo_restante.total_seconds() // 60)
+            flash(f'Você já reenviou o e-mail de confirmação recentemente. Tente novamente em {minutos_restantes} minutos.', 'alert-warning')
+            return redirect(url_for('auth.reenviar_confirmacao'))
+
+        # Envia o e-mail de confirmação e atualiza o timestamp do último envio
+        enviar_email_de_confirmacao(usuario)
+        usuario.ultimo_envio_confirmacao = datetime.utcnow()
+        database.session.commit()
+
+        flash('Um novo e-mail de confirmação foi enviado. Verifique sua caixa de entrada.', 'alert-success')
         return redirect(url_for('auth.login'))
+    # Gera o token CSRF manualmente
+    csrf_token = generate_csrf()
+    return render_template('auth/reenviar_confirmacao.html', csrf_token=csrf_token)
 
-    # Verifica se o último envio foi há mais de 10 minutos
-    if usuario.ultimo_envio_confirmacao and datetime.utcnow() < usuario.ultimo_envio_confirmacao + INTERVALO_REENVIO:
-        flash('Você já reenviou o e-mail de confirmação recentemente. Tente novamente mais tarde.', 'alert-warning')
-        return redirect(url_for('auth.login'))
-
-    # Envia o e-mail de confirmação e atualiza o timestamp do último envio
-    enviar_email_de_confirmacao(usuario)
-    usuario.ultimo_envio_confirmacao = datetime.utcnow()
-    db.session.commit()
-
-    flash('Um novo e-mail de confirmação foi enviado.', 'alert-success')
-    return redirect(url_for('auth.login'))
 
 @auth_bp.route('/esqueci_senha', methods=['GET', 'POST'])
 def esqueci_senha():

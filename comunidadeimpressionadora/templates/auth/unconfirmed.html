@@ -1,26 +1,29 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmação Pendente</title>
-    <!-- Link do Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+{% extends 'layout/base.html' %}
 
-    <div class="container text-center">
-        <div class="card shadow-lg p-4">
+{% block body %}
+<div class="container d-flex align-items-center justify-content-center vh-100">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg">
+            <div class="card-header bg-info text-white">
+                <h4 class="card-title mb-0">Confirmação de E-mail Pendente</h4>
+            </div>
             <div class="card-body">
-                <h1 class="card-title text-danger mb-4">Confirmação de E-mail Pendente</h1>
-                <p class="card-text">Você precisa confirmar seu e-mail antes de acessar esta página.</p>
-                <p class="card-text">Por favor, verifique sua caixa de entrada para o e-mail de confirmação e siga as instruções.</p>
-                <a href="{{ url_for('main.home') }}" class="btn btn-primary mt-3">Voltar para a Página Inicial</a>
+                <p class="card-text">
+                    Você precisa confirmar o seu e-mail para acessar sua conta. Verifique sua caixa de entrada para encontrar o e-mail de confirmação.
+                </p>
+                <p class="card-text">
+                    Se você não recebeu o e-mail de confirmação, clique no botão abaixo para reenviá-lo.
+                </p>
+                
+                <form action="{{ url_for('auth.reenviar_confirmacao') }}" method="POST">
+                    <!-- Inclua o token CSRF manualmente -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                    <!-- Botão de Reenviar E-mail -->
+                    <button type="submit" class="btn btn-primary w-100">Reenviar E-mail de Confirmação</button>
+                </form>
             </div>
         </div>
     </div>
-
-    <!-- Script do Bootstrap 5 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}

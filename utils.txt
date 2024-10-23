@@ -1,0 +1,12 @@
+Se você estiver usando Flask-WTF para seus formulários: O método {{ form.hidden_tag() }} gerará automaticamente o token CSRF quando você estiver usando um FlaskForm.
+Se você estiver usando formulários HTML normais (sem Flask-WTF): Você pode gerar o token CSRF manualmente com generate_csrf() e incluí-lo no formulário HTML como um campo oculto.
+
+Sim, a proteção CSRF (Cross-Site Request Forgery) é necessária apenas para formulários que usam o método POST, PUT, DELETE ou PATCH, porque esses métodos modificam dados no servidor. Portanto, você deve incluir o token CSRF nesses tipos de requisição para garantir que as ações sejam seguras.
+
+Para quais métodos o CSRF é importante:
+POST: Usado para enviar dados ao servidor (como login, criação de conta, etc.).
+PUT: Usado para atualizar dados existentes.
+DELETE: Usado para deletar dados do servidor.
+PATCH: Usado para modificar parcialmente um recurso.
+Para o método GET, a proteção CSRF não é necessária:
+O método GET é usado apenas para recuperar dados do servidor e não modifica nada. Como o GET não faz alterações nos dados, ele não é vulnerável aos mesmos tipos de ataques que os métodos POST, PUT, DELETE ou PATCH, então a proteção CSRF não é necessária nesse caso.

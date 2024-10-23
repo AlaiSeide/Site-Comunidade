@@ -22,6 +22,7 @@ class Usuario(database.Model, UserMixin):
     senha = database.Column(database.String(80), nullable=False)
 
     confirmado = database.Column(database.Boolean, default=False)
+    # Armazena o último envio de confirmação
     ultimo_envio_confirmacao = database.Column(database.DateTime, nullable=True)
     data_confirmacao = database.Column(database.DateTime, nullable=True)
     codigo_confirmacao = database.Column(database.String(6), nullable=False)  # Código de confirmação

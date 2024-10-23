@@ -1,9 +1,12 @@
 from flask import Flask
 from comunidadeimpressionadora.config import Config
-from comunidadeimpressionadora.extensions import database, bcrypt, login_manager, mail, csrf, migrate
+from comunidadeimpressionadora.extensions import database, bcrypt, login_manager, mail, csrf, migrate, limiter
+
+
 
 # Inicializando o Flask diretamente
 app = Flask(__name__)
+
 
 # Carregar as configurações da aplicação
 app.config.from_object(Config)
@@ -30,3 +33,5 @@ app.register_blueprint(post_bp, url_prefix='/post')
 app.register_blueprint(admin_bp, url_prefix='/admin')
 
 
+# Aplicar o limiter ao app
+limiter.init_app(app)

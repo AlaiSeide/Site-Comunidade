@@ -13,6 +13,15 @@ mail = Mail()
 csrf = CSRFProtect()
 migrate = Migrate()
 
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(
+    get_remote_address,
+    default_limits=["200 per day", "50 per hour"]  # Limite padrão para todas as rotas
+)
+
+
 # Configurações do login_manager
 login_manager.login_view = 'auth.login'
 login_manager.login_message = 'Faça login para acessar esta página, por favor.'
