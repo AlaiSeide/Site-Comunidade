@@ -4,15 +4,14 @@ from datetime import datetime, timezone, timedelta
 from comunidadeimpressionadora.extensions import bcrypt, database
 
 from comunidadeimpressionadora.auth import auth_bp
-from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm, RedefinirSenhaForm, ConfirmacaoEmailForm
+from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm, RedefinirSenhaForm, ConfirmacaoEmailForm, ReenviarConfirmacaoForm
 from comunidadeimpressionadora.model import Usuario
 
 from comunidadeimpressionadora.mailer import enviar_email_de_confirmacao, gerar_codigo_confirmacao, validar_token_confirmacao_email, enviar_email_de_boas_vindas, enviar_email_confirmacao_de_redefinicao_de_senha
-
+from .utils import verificar_intervalo_reenvio
 from comunidadeimpressionadora.password_reset import gerar_token, enviar_email, validar_token
 from comunidadeimpressionadora.extensions import limiter
 # Definindo um intervalo de 10 minutos entre tentativas de reenvio
-INTERVALO_REENVIO = timedelta(minutes=10)
 from flask_wtf.csrf import generate_csrf
 
 # pagina de login e criar_conta
@@ -67,7 +66,16 @@ def login():
    
     # Verifica se o usuario criou conta com sucesso
     if form_criarconta.validate_on_submit() and 'botao_submit_criarconta' in request.form:
-        
+
+        user = Usuario.query.filter_by(email=form_criarconta.email.data).first()
+        if user:
+            if not user.confirmado:
+                flash('Este e-mail já foi registrado, mas a conta não foi confirmada. Reenvie o e-mail de confirmação ou use outro e-mail.', 'alert-warning')
+                return redirect(url_for('auth.unconfirmed'))
+            else:
+                flash('E-mail já cadastrado. Cadastre-se com outro e-mail ou faça login para continuar.', 'alert-info')
+                return redirect(url_for('auth.login'))
+        # Se o usuário não existir, o código abaixo será executado
         # Gera o código de confirmação
         # Gera o código de 6 dígitos
         codigo_confirmacao = gerar_codigo_confirmacao() 
@@ -151,34 +159,36 @@ def unconfirmed():
     return render_template('auth/unconfirmed.html', csrf_token=csrf_token)
 
 @auth_bp.route('/reenviar-confirmacao', methods=['POST', 'GET'])
+@limiter.limit("5 per minute")
 def reenviar_confirmacao():
-    if request.method == 'POST':
-        email = request.form.get('email')
+    # Se o usuário estiver autenticado
+    if current_user.is_authenticated:
+        # Redireciona para a página inicial
+        return redirect(url_for('main.home'))
 
-        # Verifica se o e-mail foi preenchido
-        if not email:
-            flash('Por favor, insira o seu e-mail.', 'alert-danger')
-            return redirect(url_for('auth.reenviar_confirmacao'))
-
+    form = ReenviarConfirmacaoForm()
+    if form.validate_on_submit():
+        email = form.email.data.strip().lower()
         # Busca o usuário pelo e-mail
         usuario = Usuario.query.filter_by(email=email).first()
 
-        # Verifica se o usuário existe
-        if not usuario:
-            flash('E-mail não encontrado.', 'alert-danger')
-            return redirect(url_for('auth.reenviar_confirmacao'))
-
-        # Verifica se o usuário já confirmou o e-mail
-        if usuario.confirmado:
-            flash('Sua conta já está confirmada. Você pode fazer login.', 'alert-info')
+       # Se o usuário não existe
+        if usuario is None:
+            # Exibe uma mensagem genérica
+            flash('Se uma conta com este e-mail existir, um e-mail de confirmação foi enviado.', 'alert-success')
             return redirect(url_for('auth.login'))
 
-        # Verifica se o último envio foi há menos de 10 minutos
-        if usuario.ultimo_envio_confirmacao and datetime.utcnow() < usuario.ultimo_envio_confirmacao + INTERVALO_REENVIO:
-            tempo_restante = usuario.ultimo_envio_confirmacao + INTERVALO_REENVIO - datetime.utcnow()
-            minutos_restantes = int(tempo_restante.total_seconds() // 60)
-            flash(f'Você já reenviou o e-mail de confirmação recentemente. Tente novamente em {minutos_restantes} minutos.', 'alert-warning')
-            return redirect(url_for('auth.reenviar_confirmacao'))
+        # Se o usuário já confirmou o e-mail
+        if usuario.confirmado:
+            # Exibe a mesma mensagem genérica
+            flash('Se uma conta com este e-mail existir, um e-mail de confirmação foi enviado.', 'alert-success')
+            return redirect(url_for('auth.login'))
+        
+        # Se o usuário existe e não confirmou o e-mail
+        # Usa a função para verificar o intervalo de reenvio
+        redirecionamento = verificar_intervalo_reenvio(usuario)
+        if redirecionamento:
+            return redirecionamento
 
         # Envia o e-mail de confirmação e atualiza o timestamp do último envio
         enviar_email_de_confirmacao(usuario)
@@ -188,8 +198,8 @@ def reenviar_confirmacao():
         flash('Um novo e-mail de confirmação foi enviado. Verifique sua caixa de entrada.', 'alert-success')
         return redirect(url_for('auth.login'))
     # Gera o token CSRF manualmente
-    csrf_token = generate_csrf()
-    return render_template('auth/reenviar_confirmacao.html', csrf_token=csrf_token)
+    #csrf_token = generate_csrf()
+    return render_template('auth/reenviar_confirmacao.html', form=form)
 
 
 @auth_bp.route('/esqueci_senha', methods=['GET', 'POST'])
@@ -274,14 +284,12 @@ def redefinir_senha(token):
     # Renderiza o formulário de redefinir_senha.html
     return render_template('auth/redefinir_senha.html', form=form)
 
-
-# pagina de sair
-@auth_bp.route('/sair')
-@login_required
+@auth_bp.route('/sair', methods=['POST'])
 def sair():
-    # sair e redirecionar para a pagina home
-    logout_user()
-    flash('Logout feito com Sucesso', 'alert-success')
-    return redirect(url_for('main.home'))
+    """Rota de logout que desconecta o usuário."""
+    logout_user()  # Desconecta o usuário
+    session.clear()  # Limpa a sessão do usuário
+    flash('Logout feito com sucesso', 'alert-success')
+    return redirect(url_for('auth.login'))  # Redireciona para a página de login
 
 

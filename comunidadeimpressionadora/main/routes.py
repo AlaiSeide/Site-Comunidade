@@ -4,13 +4,14 @@ from flask_login import login_required, current_user
 from comunidadeimpressionadora.extensions import database
 from comunidadeimpressionadora.main import main_bp
 from comunidadeimpressionadora.model import Post, Usuario
-from comunidadeimpressionadora.forms import ContatoForm
+from comunidadeimpressionadora.forms import ContatoForm, LogoutForm
 
 @main_bp.route('/')
 def home():
     # Busca todos os posts e ordena-os do mais recente para o mais antigo
     posts = Post.query.order_by(Post.id.desc()).all()
-    return render_template('home.html', posts=posts)
+    form = LogoutForm()  # Instancia o formulário
+    return render_template('home.html', posts=posts, form=form)
 
 
 # pagina de usuarios

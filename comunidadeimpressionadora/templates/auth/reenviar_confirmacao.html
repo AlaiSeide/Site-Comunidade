@@ -6,18 +6,30 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-warning text-dark">
-                    <h4 class="card-title mb-0">E-mail Não Confirmado</h4>
+                    <h4 class="card-title mb-0">Reenviar E-mail de Confirmação</h4>
                 </div>
                 <div class="card-body">
                     <p class="card-text">Por favor, insira seu e-mail para reenviar o e-mail de confirmação.</p>
                     <form action="{{ url_for('auth.reenviar_confirmacao') }}" method="POST">
-                        <!-- Incluindo o token CSRF manualmente -->
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <!-- Incluindo o token CSRF -->
+                        {{ form.csrf_token }}
 
                         <!-- Campo de E-mail -->
-                        <div class="mb-3">
-                            <label for="email" class="form-label">E-mail</label>
-                            <input type="email" id="email" name="email" class="form-control" placeholder="Digite seu e-mail" required>
+                        <div class="form-group">
+                            <!-- Rótulo do campo de e-mail -->
+                            {{ form.email.label(class="form-control-label") }}
+                            
+                            <!-- Verifica se há erros no campo de e-mail -->
+                            {% if form.email.errors %}
+                                {{ form.email(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for erro in form.email.errors %}
+                                        {{ erro }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.email(class="form-control") }}
+                            {% endif %}
                         </div>
 
                         <!-- Botão de Enviar -->

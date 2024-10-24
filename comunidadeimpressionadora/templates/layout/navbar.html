@@ -40,7 +40,12 @@
                     </li>
 
                     <li class="nav-item">
-                        <a hx-boost="false" class="nav-link active" aria-current="page" href="{{ url_for('auth.sair') }}"><i class="bi bi-box-arrow-left"></i> Sair</a>
+                        <form action="{{ url_for('auth.sair') }}" method="POST" class="d-inline">
+                            {{ form.csrf_token }}  <!-- Adiciona proteção CSRF -->
+                            <button type="submit" class="btn btn-link nav-link active">
+                                <i class="bi bi-box-arrow-left"></i> Sair
+                            </button>
+                        </form>
                     </li>
                 <!--Isso ai so vai aparecer se o usuario nao estiver autenticado-->
                 {% else %}

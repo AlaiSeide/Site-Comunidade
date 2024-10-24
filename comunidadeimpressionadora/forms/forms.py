@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationE
 from comunidadeimpressionadora.model import Usuario, Contato
 from flask_login import current_user
 from comunidadeimpressionadora.extensions import bcrypt
-from .validators import validar_senha, validar_email_unico, validar_email_temporario, validar_email_dns
+from .validators import validar_senha, validar_email_temporario, validar_email_dns #, validar_email_unico
 
 # Formularios de criar conta
 class FormCriarConta(FlaskForm):
@@ -23,7 +23,7 @@ class FormCriarConta(FlaskForm):
     # funcao de validacao para um email unico no banco de dados
     def validate_email(self, email):
        # Validação de e-mail único
-        validar_email_unico(email)
+       # validar_email_unico(email)
         
         # Validação para impedir domínios temporários
         validar_email_temporario(email)
@@ -160,4 +160,11 @@ class ConfirmacaoEmailForm(FlaskForm):
     submit = SubmitField('Confirmar')
 
 # class ConfirmarExclusaoContaForm(FlaskForm):
-    
+
+
+class ReenviarConfirmacaoForm(FlaskForm):
+    email = StringField('E-mail', validators=[DataRequired(), Email()])
+    submit = SubmitField('Reenviar Confirmação')
+
+class LogoutForm(FlaskForm):
+    submit = SubmitField('Sair')
