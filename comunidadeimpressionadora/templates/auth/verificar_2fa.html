@@ -1,0 +1,27 @@
+{% extends "layout/base.html" %}
+
+{% block body %}
+<div class="container mt-5">
+    <h2>Verificação de Duas Etapas (2FA)</h2>
+    <p>Por favor, insira o código de verificação gerado pelo Google Authenticator.</p>
+    <form method="POST" action="{{ url_for('auth.verificar_2fa') }}">
+        {{ form.hidden_tag() }}  <!-- Campo oculto para proteção CSRF -->
+        
+        <!-- Campo de código -->
+        <div class="form-group">
+            {{ form.codigo.label(class="form-label") }}
+            {{ form.codigo(class="form-control") }}
+            {% if form.codigo.errors %}
+                <div class="invalid-feedback">
+                    {% for erro in form.codigo.errors %}
+                        {{ erro }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Botão de Verificar -->
+        <button type="submit" class="btn btn-primary">{{ form.botao_submit_verificacao.label }}</button>
+    </form>
+</div>
+{% endblock %}

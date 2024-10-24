@@ -20,7 +20,7 @@ class Usuario(database.Model, UserMixin):
     username = database.Column(database.String(50), nullable=False)
     email = database.Column(database.String(120), nullable=False, unique=True)
     senha = database.Column(database.String(80), nullable=False)
-
+    two_factor_secret = database.Column(database.String(32))  # Armazenar a chave secreta 2FA
     confirmado = database.Column(database.Boolean, default=False)
     # Armazena o último envio de confirmação
     ultimo_envio_confirmacao = database.Column(database.DateTime, nullable=True)

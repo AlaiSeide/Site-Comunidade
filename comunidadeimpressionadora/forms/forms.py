@@ -1,5 +1,5 @@
 # Arquivo de formularios
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
@@ -14,6 +14,7 @@ class FormCriarConta(FlaskForm):
     email = StringField('E-mail', validators=[DataRequired(), Email()])
     senha = PasswordField('Senha', validators=[DataRequired(), Length(6, 20)])
     confirmacao_senha = PasswordField('Confirmação da Senha', validators=[DataRequired(), EqualTo('senha')])
+    recaptcha = RecaptchaField()  # Adiciona o campo de reCAPTCHA
     botao_submit_criarconta = SubmitField('Criar Conta')
 
 
@@ -22,8 +23,8 @@ class FormCriarConta(FlaskForm):
 
     # funcao de validacao para um email unico no banco de dados
     def validate_email(self, email):
-       # Validação de e-mail único
-       # validar_email_unico(email)
+        # Validação de e-mail único
+        # validar_email_unico(email)
         
         # Validação para impedir domínios temporários
         validar_email_temporario(email)
@@ -37,6 +38,7 @@ class FormLogin(FlaskForm):
     senha = PasswordField('Senha', validators=[DataRequired(), Length(6, 20)])
     mostrar_senha = BooleanField('Mostrar Senha')
     lembrar_dados = BooleanField('Lembrar Dados de Acesso')
+    recaptcha = RecaptchaField()  # Adiciona o campo de reCAPTCHA
     botao_submit_login = SubmitField('Fazer Login')
 
 
@@ -168,3 +170,7 @@ class ReenviarConfirmacaoForm(FlaskForm):
 
 class LogoutForm(FlaskForm):
     submit = SubmitField('Sair')
+
+class FormVerificacao2FA(FlaskForm):
+    codigo = StringField('Código de Verificação', validators=[DataRequired(), Length(6, 6)])  # O código é sempre de 6 dígitos
+    botao_submit_verificacao = SubmitField('Verificar')

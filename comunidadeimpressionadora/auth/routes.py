@@ -4,37 +4,82 @@ from datetime import datetime, timezone, timedelta
 from comunidadeimpressionadora.extensions import bcrypt, database
 
 from comunidadeimpressionadora.auth import auth_bp
-from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm, RedefinirSenhaForm, ConfirmacaoEmailForm, ReenviarConfirmacaoForm
+from comunidadeimpressionadora.forms import FormLogin, FormCriarConta, EsqueciSenhaForm, RedefinirSenhaForm, ConfirmacaoEmailForm, ReenviarConfirmacaoForm, FormVerificacao2FA
 from comunidadeimpressionadora.model import Usuario
 
 from comunidadeimpressionadora.mailer import enviar_email_de_confirmacao, gerar_codigo_confirmacao, validar_token_confirmacao_email, enviar_email_de_boas_vindas, enviar_email_confirmacao_de_redefinicao_de_senha
 from .utils import verificar_intervalo_reenvio
 from comunidadeimpressionadora.password_reset import gerar_token, enviar_email, validar_token
 from comunidadeimpressionadora.extensions import limiter
+from comunidadeimpressionadora.services.two_factor_auth import verificar_codigo_2fa, gerar_chave_secreta, exibir_qr_code
+
 # Definindo um intervalo de 10 minutos entre tentativas de reenvio
 from flask_wtf.csrf import generate_csrf
+
+@auth_bp.route('/ativar_2fa')
+def ativar_2fa():
+    """
+    Gera uma chave secreta e exibe um QR code para o usuário escanear com o Google Authenticator.
+    """
+    if current_user.two_factor_secret is None:
+        # Gera a chave secreta se o usuário ainda não tem
+        secret = gerar_chave_secreta()
+        current_user.two_factor_secret = secret
+        database.session.commit()
+    
+    # Exibe o QR Code que o usuário escaneará
+    return exibir_qr_code(current_user.email, current_user.two_factor_secret)
+
+@auth_bp.route('/verificar_2fa', methods=['GET', 'POST'])
+def verificar_2fa():
+    """
+    Verifica o código 2FA fornecido pelo usuário após o login com sucesso.
+    O código de 6 dígitos fornecido pelo Google Authenticator é verificado
+    e, se for válido, o usuário é redirecionado para o dashboard.
+    """
+    form = FormVerificacao2FA()
+    if form.validate_on_submit():
+        codigo = form.codigo.data
+        if verificar_codigo_2fa(current_user.two_factor_secret, codigo):
+            # Se o código for correto, o login está completo
+            flash('Autenticação 2FA bem-sucedida!', 'alert-success')
+            return redirect(url_for('main.home'))
+        else:
+            flash('Código 2FA incorreto. Tente novamente.', 'alert-danger')
+    
+    return render_template('auth/verificar_2fa.html', form=form)
 
 # pagina de login e criar_conta
 # A funcao e uma pagina de formulario tem que ter o metodo POST/GET
 @auth_bp.route('/login', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")  # Limita 5 requisições por minuto na rota de login
 def login(): 
+    """
+    Rota para login de usuários. Primeiro, verifica se a senha está correta.
+    Se o 2FA estiver ativado, redireciona o usuário para a página de verificação do 2FA.
+    """
     # se o usuario estiver autenticado redireciona para o home, impedir ele de acessar a pagina de login
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    # instanciando o meu formulario de login a minha classe FormLogin()
-    form_login = FormLogin()
 
-    # instanciando o meu formulario de criar_conta a minha classe FormCriarConta()
+    # Instancia os formulários de login e criação de conta
+    form_login = FormLogin()
     form_criarconta = FormCriarConta()
 
     # Verifica se o usuario fez login com sucesso
     if form_login.validate_on_submit() and 'botao_submit_login' in request.form:
         # Então, resumindo, essa linha de código está procurando no banco de dados pelo usuário que possui o email fornecido no formulário de login e armazenando esse usuário na variável usuario.
         usuario = Usuario.query.filter_by(email = form_login.email.data).first()
+
         #print(usuario.senha)
         # se o usuario existe e se a senha que ele preencheu é a mesma que ta no banco de dados
         if usuario and bcrypt.check_password_hash(usuario.senha, form_login.senha.data):
+            # Se o 2FA estiver ativado para este usuário
+            if usuario.two_factor_secret:
+                # Armazena as informações de login temporariamente e redireciona para a verificação do código 2FA
+                login_user(usuario, remember=form_login.lembrar_dados.data)
+                flash('Por favor, insira o código de verificação do seu Google Authenticator.', 'alert-info')
+                return redirect(url_for('auth.verificar_2fa'))
             # deixa o usuario fazer login se ele ja confirmou o seu email
             if usuario.confirmado:
                 # fazendo login do usuario
@@ -66,7 +111,6 @@ def login():
    
     # Verifica se o usuario criou conta com sucesso
     if form_criarconta.validate_on_submit() and 'botao_submit_criarconta' in request.form:
-
         user = Usuario.query.filter_by(email=form_criarconta.email.data).first()
         if user:
             if not user.confirmado:
@@ -107,6 +151,11 @@ def login():
         # redirecionar para outra pagina
         # o return deve estar sempre atras do redirect(url_for('home'))
         return redirect(url_for("auth.unconfirmed"))
+    else:
+        # Se a validação falhar, exibe os erros
+        for field, errors in form_criarconta.errors.items():
+            for error in errors:
+                flash(f"Erro no campo {field}: {error}", "alert-danger")
 
     # form_login=form_login, form_criarconta=form_criarconta está dentro da minha funcao render_template() para poderem ser mostrados dentro da minha pagina html
     return render_template('auth/login.html', form_login=form_login, form_criarconta=form_criarconta)
